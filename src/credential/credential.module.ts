@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { CredentialService } from './credential.service';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CredentialService } from './credential.service';
 import { Credential, CredentialSchema } from './entities/credential.entity';
 
 @Module({

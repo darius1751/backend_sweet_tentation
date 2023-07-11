@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from 
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { LoginCredentialDto } from 'src/credential/dto/login-credential.dto';
 
 @Controller('user')
 export class UserController {
@@ -11,6 +12,11 @@ export class UserController {
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
+  }
+
+  @Post('login')
+  login(@Body() loginCredentialDto: LoginCredentialDto) {
+    return this.userService.login(loginCredentialDto);
   }
 
   @Get()

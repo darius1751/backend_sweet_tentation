@@ -1,11 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from './entities/user.entity';
 import { Model } from 'mongoose';
+import { User } from './entities/user.entity';
 import { CredentialService } from 'src/credential/credential.service';
 import { RoleService } from 'src/role/role.service';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginCredentialDto } from 'src/credential/dto/login-credential.dto';
 
 @Injectable()
 export class UserService {
@@ -16,6 +17,14 @@ export class UserService {
     private readonly roleService: RoleService
   ) { }
 
+  async login(loginCredentialDto: LoginCredentialDto) {
+    const credentialId = await this.credentialService.login(loginCredentialDto);
+    const user = await this.userModel.findOne({ credentialId, active: true }, { credentialId: false });
+    if (user)
+      return user;
+    throw new ForbiddenException(`User not active`);
+  }
+
   async create(createUserDto: CreateUserDto) {
     const { email, credential, phone, roleId } = createUserDto;
     await this.validateEmailAndPhone(email, phone);
@@ -24,25 +33,27 @@ export class UserService {
       const { _id } = await this.credentialService.create(credential);
       return await this.userModel.create({ ...createUserDto, credentialId: _id });
     } catch (exception) {
-      throw new BadRequestException(`Error`);
+      throw new BadRequestException(`${exception.message}`);
     }
   }
 
   private async validateEmailAndPhone(email: string, phone: string) {
-    if (this.existEmail(email))
+    const existEmail = await this.existEmail(email);
+    if (existEmail)
       throw new BadRequestException(`Email: ${email} exist in db`);
-    if (this.existPhone(phone))
+    const existPhone = await this.existPhone(phone);
+    if (existPhone)
       throw new BadRequestException(`Phone: ${phone} exist in db`);
   }
 
   private async existEmail(email: string) {
-    const { _id } = await this.userModel.exists({ email });
-    return _id != null;
+    const existEmail = await this.userModel.exists({ email });
+    return existEmail != null;
   }
 
   private async existPhone(phone: string) {
-    const { _id } = await this.userModel.exists({ phone });
-    return _id != null;
+    const existPhone = await this.userModel.exists({ phone });
+    return existPhone != null;
   }
 
   async findAll(skip: number, take: number) {
@@ -65,13 +76,13 @@ export class UserService {
     try {
       return this.userModel.findByIdAndUpdate(id, updateUserDto);
     } catch (exception) {
-      throw new BadRequestException(`Error`);
+      throw new BadRequestException(`Error in update`);
     }
   }
 
   async remove(id: string) {
-    const user = await this.findOneById(id);
-    if(user.active)
+    const { active } = await this.findOneById(id);
+    if (active)
       return await this.userModel.findByIdAndUpdate(id, { $set: { active: false } });
     throw new BadRequestException(`User with id: ${id} not is active`);
   }

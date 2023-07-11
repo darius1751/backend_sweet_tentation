@@ -1,16 +1,16 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
-@Schema()
+@Schema({ versionKey: false })
 export class Credential {
-    
+
     @Prop({
         unique: true,
-        required:true
+        required: true
     })
     public readonly user: string;
 
     @Prop({
-        required:true,
+        required: true,
     })
     public readonly password: string;
 }
