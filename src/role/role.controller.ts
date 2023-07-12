@@ -1,5 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { RoleService } from './role.service';
+import { MongoIdPipe } from 'src/pipe/mongo-id/mongo-id.pipe';
 
 @Controller('role')
 export class RoleController {
@@ -12,7 +13,7 @@ export class RoleController {
   }
 
   @Get(':id')
-  findOneById(@Param('id') id: string) {
+  findOneById(@Param('id', MongoIdPipe) id: string) {
     return this.roleService.findOneById(id);
   }
 }

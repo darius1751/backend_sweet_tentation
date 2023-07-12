@@ -7,6 +7,8 @@ import { env } from 'process';
 import { CredentialModule } from './credential/credential.module';
 import { UserModule } from './user/user.module';
 import { RoleModule } from './role/role.module';
+import { SweetModule } from './sweet/sweet.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -17,7 +19,9 @@ import { RoleModule } from './role/role.module';
     }),
     CredentialModule,
     UserModule,
-    RoleModule
+    RoleModule,
+    SweetModule,
+    CategoryModule
   ],
   controllers: [AppController],
   providers: [AppService],
