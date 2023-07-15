@@ -9,7 +9,7 @@ import { UserModule } from './user/user.module';
 import { RoleModule } from './role/role.module';
 import { SweetModule } from './sweet/sweet.module';
 import { CategoryModule } from './category/category.module';
-
+import { v2 as cloudinary } from 'cloudinary';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -26,4 +26,12 @@ import { CategoryModule } from './category/category.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule{
+  constructor(){
+    cloudinary.config({ 
+      cloud_name: env.CLOUD_NAME, 
+      api_key: env.CLOUD_API_KEY, 
+      api_secret: env.CLOUD_API_SECRET
+    });
+  }
+}
