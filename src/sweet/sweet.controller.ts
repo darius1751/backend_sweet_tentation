@@ -12,6 +12,7 @@ export class SweetController {
   constructor(private readonly sweetService: SweetService) { }
 
   @Post()
+  
   @UseInterceptors(
     FileFieldsInterceptor([{
       name: 'mainImage', maxCount: 1
@@ -22,7 +23,7 @@ export class SweetController {
       dest: './temp',
       limits:{
         fileSize: 2000000 //2MB
-      }
+      },
     })
   )
   create(
