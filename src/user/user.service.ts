@@ -58,7 +58,7 @@ export class UserService {
 
   async findAll(skip: number, take: number) {
     try {
-      return this.userModel.find({}, {}, { limit: take, skip });
+      return this.userModel.find({}, { credentialId: false }, { limit: take, skip });
     } catch (exception) {
       throw new BadRequestException(`skip and take is a positive int`);
     }
