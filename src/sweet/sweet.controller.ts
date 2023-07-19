@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors, UploadedFiles, UseFilters } from '@nestjs/common';
 import { SweetService } from './sweet.service';
 import { UpdateSweetDto } from './dto/update-sweet.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateSweetDto } from './dto/create-sweet.dto';
 import { validateFile } from 'src/utils/validateFile';
 import { CreateSweetImagesDto } from './dto/create-sweet-images.dto';
+import { CreateWithFileErrorFilter } from 'src/filters/create-with-file-error/create-with-file-error.filter';
 
 @Controller('sweet')
 export class SweetController {
@@ -12,6 +13,7 @@ export class SweetController {
   constructor(private readonly sweetService: SweetService) { }
 
   @Post()
+  @UseFilters(CreateWithFileErrorFilter)
   @UseInterceptors(
     FileFieldsInterceptor([{
       name: 'mainImage', maxCount: 1
@@ -22,7 +24,7 @@ export class SweetController {
       dest: './temp',
       limits:{
         fileSize: 2000000 //2MB
-      }
+      }      
     })
   )
   create(

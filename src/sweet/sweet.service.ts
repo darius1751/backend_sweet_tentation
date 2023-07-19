@@ -1,12 +1,15 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { unlink } from 'fs/promises';
+import { v2 as cloudinary } from 'cloudinary';
+import { Sweet } from './entities/sweet.entity';
 import { CreateSweetDto } from './dto/create-sweet.dto';
 import { UpdateSweetDto } from './dto/update-sweet.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { Sweet } from './entities/sweet.entity';
-import { Model } from 'mongoose';
-import { v2 as cloudinary } from 'cloudinary';
 import { CreateSweetImagesDto } from './dto/create-sweet-images.dto';
+import { UpdateSweetImagesDto } from './dto/update-sweet-images.dto';
 import { CategoryService } from 'src/category/category.service';
+
 @Injectable()
 export class SweetService {
 
@@ -19,11 +22,14 @@ export class SweetService {
     const { title, categories } = createSweetDto;
     await this.existSweetWithTitle(title);
     await this.validateCategories(categories);
+    const { mainImage, images } = createSweetImagesDto;
+    if (!mainImage)
+      throw new BadRequestException(`not send mainImage of the sweet`);
     try {
-      const { mainImage, images } = createSweetImagesDto;
-      console.time(); // Intentar optimizar si es posible el guardado de imagenes.
+      console.time('process-saveImages'); // Intentar optimizar si es posible el guardado de imagenes.
       const { mainImageSecureURL, imagesSecureURL } = await this.saveImages(title, mainImage[0], images);
-      console.timeEnd(); //5.11..? seg
+      console.timeEnd('process-saveImages'); //5.41..? seg
+      await this.removeImages([...images, mainImage[0]]);
       return await this.sweetModel.create({ ...createSweetDto, mainImage: mainImageSecureURL, images: imagesSecureURL });
     } catch (exception) {
       throw new InternalServerErrorException(`${exception.message}`);
@@ -46,17 +52,26 @@ export class SweetService {
 
   private async saveImages(title: string, mainImage: Express.Multer.File, images: Express.Multer.File[]) {
     const mainImageSecureURL = await this.saveImage(mainImage.path, title, "mainImage");
-    const imagesSecureURL: { source: string }[] = [];
-    for (let i = 0; i < images.length; i++) {
-      const { path } = images[i];
-      imagesSecureURL.push(await this.saveImage(path, title, `image${i + 1}`));
+    const imagesSecureURL: { secureUrl: string }[] = [];
+    if (images) {
+      for (let i = 0; i < images.length; i++) {
+        const { path } = images[i];
+        imagesSecureURL.push(await this.saveImage(path, title, `image${i + 1}`));
+      }
     }
     return { mainImageSecureURL, imagesSecureURL };
   }
 
   private async saveImage(path: string, title: string, publicId: string) {
     const { secure_url } = await cloudinary.uploader.upload(path, { public_id: `sweet/${title}/${publicId}` });
-    return { source: secure_url };
+    return { secureUrl: secure_url };
+  }
+
+  private async removeImages(images: Express.Multer.File[]) {
+    for (const image of images) {
+      const { path } = image;
+      await unlink(path);
+    }
   }
 
   async findAll(skip: number, take: number) {
@@ -75,16 +90,22 @@ export class SweetService {
     throw new BadRequestException(`Not exist sweet with id: ${id}`);
   }
 
-  update(id: string, updateSweetDto: UpdateSweetDto) {
-    return; //Implent update
+  async update(id: string, updateSweetDto: UpdateSweetDto, updateSweetImagesDto?: UpdateSweetImagesDto) {
+    const { mainImage, images } = await this.findOneById(id);
+    return await this.sweetModel.findByIdAndUpdate(id, { ...updateSweetDto });
   }
 
   async remove(id: string) {
     const { title, images } = await this.findOneById(id);
-    await cloudinary.uploader.destroy(`sweet/${title}/mainImage`);
-    for (let i = 0; i < images.length; i++) {
-      await cloudinary.uploader.destroy(`sweet/${title}/image${i + 1}`);
+    try {
+      await cloudinary.uploader.destroy(`sweet/${title}/mainImage`);
+      for (let i = 0; i < images.length; i++) {
+        await cloudinary.uploader.destroy(`sweet/${title}/image${i + 1}`);
+      }
+      return this.sweetModel.findByIdAndDelete(id);
+    } catch (exception) {
+      throw new InternalServerErrorException(`${exception.message}`);
     }
-    return this.sweetModel.findByIdAndDelete(id);
+
   }
 }

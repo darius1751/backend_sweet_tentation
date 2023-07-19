@@ -23,8 +23,5 @@ export class Sweet {
 
     @Prop({ required: false })
     public readonly description: string;
-
-    @Prop({ required: false, default: false })
-    public readonly novelty: boolean;
 }
 export const SweetSchema = SchemaFactory.createForClass(Sweet);
