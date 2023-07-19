@@ -12,7 +12,7 @@ export class CreateWithFileErrorFilter implements ExceptionFilter {
     const status = exception.getStatus();
     const files = await readdir('./temp');
     for (let file of files) {
-      await unlink(join('temp', file));
+      await unlink(join('.','temp', file));
     }
     response
       .status(status)

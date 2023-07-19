@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors, UploadedFiles, UseFilters } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors, UploadedFiles, UseFilters, Query } from '@nestjs/common';
 import { SweetService } from './sweet.service';
 import { UpdateSweetDto } from './dto/update-sweet.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -6,6 +6,7 @@ import { CreateSweetDto } from './dto/create-sweet.dto';
 import { validateFile } from 'src/utils/validateFile';
 import { CreateSweetImagesDto } from './dto/create-sweet-images.dto';
 import { CreateWithFileErrorFilter } from 'src/filters/create-with-file-error/create-with-file-error.filter';
+import { MongoIdPipe } from 'src/pipe/mongo-id/mongo-id.pipe';
 
 @Controller('sweet')
 export class SweetController {
@@ -22,9 +23,9 @@ export class SweetController {
     }], {
       fileFilter: validateFile,
       dest: './temp',
-      limits:{
+      limits: {
         fileSize: 2000000 //2MB
-      }      
+      }
     })
   )
   create(
@@ -36,24 +37,24 @@ export class SweetController {
 
   @Get()
   findAll(
-    @Param('skip', ParseIntPipe) skip: number,
-    @Param('take', ParseIntPipe) take: number
+    @Query('skip', ParseIntPipe) skip: number,
+    @Query('take', ParseIntPipe) take: number
   ) {
     return this.sweetService.findAll(skip, take);
   }
 
   @Get(':id')
-  findOneById(@Param('id') id: string) {
+  findOneById(@Param('id', MongoIdPipe) id: string) {
     return this.sweetService.findOneById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSweetDto: UpdateSweetDto) {
+  update(@Param('id', MongoIdPipe) id: string, @Body() updateSweetDto: UpdateSweetDto) {
     return this.sweetService.update(id, updateSweetDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', MongoIdPipe) id: string) {
     return this.sweetService.remove(id);
   }
 }

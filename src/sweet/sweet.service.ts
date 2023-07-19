@@ -9,6 +9,9 @@ import { UpdateSweetDto } from './dto/update-sweet.dto';
 import { CreateSweetImagesDto } from './dto/create-sweet-images.dto';
 import { UpdateSweetImagesDto } from './dto/update-sweet-images.dto';
 import { CategoryService } from 'src/category/category.service';
+import { join } from 'path';
+import { saveImage } from 'src/utils/saveImage';
+import { removeImage } from 'src/utils/removeImage';
 
 @Injectable()
 export class SweetService {
@@ -29,7 +32,7 @@ export class SweetService {
       console.time('process-saveImages'); // Intentar optimizar si es posible el guardado de imagenes.
       const { mainImageSecureURL, imagesSecureURL } = await this.saveImages(title, mainImage[0], images);
       console.timeEnd('process-saveImages'); //5.41..? seg
-      await this.removeImages([...images, mainImage[0]]);
+      await this.removeLocalImages([...images, mainImage[0]]);
       return await this.sweetModel.create({ ...createSweetDto, mainImage: mainImageSecureURL, images: imagesSecureURL });
     } catch (exception) {
       throw new InternalServerErrorException(`${exception.message}`);
@@ -51,23 +54,20 @@ export class SweetService {
   }
 
   private async saveImages(title: string, mainImage: Express.Multer.File, images: Express.Multer.File[]) {
-    const mainImageSecureURL = await this.saveImage(mainImage.path, title, "mainImage");
+    const mainImageSecureURL = await saveImage(mainImage.path, join("sweet", title,"mainImage"));
     const imagesSecureURL: { secureUrl: string }[] = [];
     if (images) {
       for (let i = 0; i < images.length; i++) {
         const { path } = images[i];
-        imagesSecureURL.push(await this.saveImage(path, title, `image${i + 1}`));
+        imagesSecureURL.push(await saveImage(path, join("sweet", title, `image${i + 1}`)));
       }
     }
     return { mainImageSecureURL, imagesSecureURL };
   }
 
-  private async saveImage(path: string, title: string, publicId: string) {
-    const { secure_url } = await cloudinary.uploader.upload(path, { public_id: `sweet/${title}/${publicId}` });
-    return { secureUrl: secure_url };
-  }
+  
 
-  private async removeImages(images: Express.Multer.File[]) {
+  private async removeLocalImages(images: Express.Multer.File[]) {
     for (const image of images) {
       const { path } = image;
       await unlink(path);
@@ -98,9 +98,9 @@ export class SweetService {
   async remove(id: string) {
     const { title, images } = await this.findOneById(id);
     try {
-      await cloudinary.uploader.destroy(`sweet/${title}/mainImage`);
+      await removeImage(`sweet/${title}/mainImage`);
       for (let i = 0; i < images.length; i++) {
-        await cloudinary.uploader.destroy(`sweet/${title}/image${i + 1}`);
+        await removeImage(`sweet/${title}/image${i + 1}`);
       }
       return this.sweetModel.findByIdAndDelete(id);
     } catch (exception) {
