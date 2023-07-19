@@ -5,7 +5,7 @@ import { Document, SchemaTypes } from "mongoose";
 export class Image extends Document {
 
     @Prop({ unique: true })
-    public readonly source: string;
+    public readonly secureUrl: string;
 
     @Prop({ type: SchemaTypes.Date, default: Date.now() })
     public readonly createdAt: string;

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { unlinkSync } from 'fs';
+import { unlink } from 'fs/promises';
 import { v2 as cloudinary } from 'cloudinary';
 import { Sweet } from './entities/sweet.entity';
 import { CreateSweetDto } from './dto/create-sweet.dto';
@@ -52,8 +52,8 @@ export class SweetService {
 
   private async saveImages(title: string, mainImage: Express.Multer.File, images: Express.Multer.File[]) {
     const mainImageSecureURL = await this.saveImage(mainImage.path, title, "mainImage");
-    const imagesSecureURL: { source: string }[] = [];
-    if(images){
+    const imagesSecureURL: { secureUrl: string }[] = [];
+    if (images) {
       for (let i = 0; i < images.length; i++) {
         const { path } = images[i];
         imagesSecureURL.push(await this.saveImage(path, title, `image${i + 1}`));
@@ -64,13 +64,13 @@ export class SweetService {
 
   private async saveImage(path: string, title: string, publicId: string) {
     const { secure_url } = await cloudinary.uploader.upload(path, { public_id: `sweet/${title}/${publicId}` });
-    return { source: secure_url };
+    return { secureUrl: secure_url };
   }
 
   private async removeImages(images: Express.Multer.File[]) {
     for (const image of images) {
       const { path } = image;
-      unlinkSync(path);
+      await unlink(path);
     }
   }
 

@@ -6,8 +6,7 @@ export class CreateSweetDto {
     @IsString()
     public readonly title: string;
 
-    @IsNumberString()
-    @Min(0)
+    @IsNumberString({ no_symbols: true })
     public readonly price: number;
 
     @IsArray({ context: MongoIdPipe })
@@ -17,5 +16,5 @@ export class CreateSweetDto {
     @IsString()
     @IsOptional()
     public readonly description?: string;
-    
+
 }
