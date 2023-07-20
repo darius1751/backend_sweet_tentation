@@ -79,7 +79,7 @@ export class SweetService {
     try {
       return await this.sweetModel.find({}, { images: false }, { skip, limit: take });
     } catch (exception) {
-      throw new BadRequestException(`skip and take is a int positive`);
+      throw new BadRequestException(`skip and take must be int positive`);
     }
   }
 
