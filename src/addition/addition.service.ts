@@ -21,7 +21,7 @@ export class AdditionService {
     await this.existAdditionWithName(name);
     try {
       const { path } = image;
-      const imageSecureURL = await saveImage(path, join('addition', name));
+      const imageSecureURL = await saveImage(path, join('additions', name));
       await this.removeLocalImage(path);
       return await this.additionModel.create({ ...createAdditionDto, image: imageSecureURL });
     } catch (exception) {
@@ -62,7 +62,7 @@ export class AdditionService {
   async remove(id: string) {
     const { name } = await this.findOneById(id);
     try {
-      await removeImage(join('addition', name));
+      await removeImage(join('additions', name));
       return await this.additionModel.findByIdAndDelete(id);
     } catch (exception) {
       throw new InternalServerErrorException(`Error in remove addition: ${exception.message}`);

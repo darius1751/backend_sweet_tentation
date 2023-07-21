@@ -1,5 +1,4 @@
-import { IsArray, IsNumber, IsNumberString, IsOptional, IsPositive, IsString, Min } from "class-validator";
-import { MongoIdPipe } from "src/pipe/mongo-id/mongo-id.pipe";
+import { IsNumberString, IsOptional, IsString } from "class-validator";
 
 export class CreateSweetDto {
 
@@ -9,7 +8,7 @@ export class CreateSweetDto {
     @IsNumberString({ no_symbols: true })
     public readonly price: number;
 
-    @IsArray({ context: MongoIdPipe })
+    @IsString()
     @IsOptional()
     public readonly categories?: string[];
 

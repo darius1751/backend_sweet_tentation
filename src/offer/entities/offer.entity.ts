@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { SchemaTypes } from "mongoose";
 import { Category } from "src/category/entities/category.entity";
 import { Image, ImageSchema } from "src/sweet/entities/image.entity";
+import { Sweet } from "src/sweet/entities/sweet.entity";
 
 @Schema({ versionKey: false })
 export class Offer {
@@ -12,7 +13,7 @@ export class Offer {
     @Prop([{ type: ImageSchema }])
     public readonly images: Image[];
 
-    @Prop({ required: true })
+    @Prop({ required: true, unique: true })
     public readonly title: string;
 
     @Prop({ default: true })
@@ -27,6 +28,9 @@ export class Offer {
     @Prop({ min: 0 })
     public readonly newPrice: number;
 
+    @Prop([{ type: SchemaTypes.ObjectId, ref: Sweet.name }])
+    public readonly sweets: string[];
+
     @Prop([{ type: SchemaTypes.ObjectId, ref: Category.name }])
     public readonly categories: string[];
 
@@ -36,7 +40,7 @@ export class Offer {
     @Prop({ type: SchemaTypes.Date, default: Date.now() })
     public readonly createdAt: string;
 
-    @Prop({ type: SchemaTypes.Date })
+    @Prop({ type: SchemaTypes.Date, validators: [(date: string) => new Date(date).getDate() > Date.now()] })
     public readonly limitTime: string;
 }
 export const OfferSchema = SchemaFactory.createForClass(Offer);
