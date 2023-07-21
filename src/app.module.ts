@@ -11,6 +11,7 @@ import { SweetModule } from './sweet/sweet.module';
 import { CategoryModule } from './category/category.module';
 import { v2 as cloudinary } from 'cloudinary';
 import { AdditionModule } from './addition/addition.module';
+import { OfferModule } from './offer/offer.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -23,7 +24,8 @@ import { AdditionModule } from './addition/addition.module';
     RoleModule,
     SweetModule,
     CategoryModule,
-    AdditionModule
+    AdditionModule,
+    OfferModule
   ],
   controllers: [AppController],
   providers: [AppService],

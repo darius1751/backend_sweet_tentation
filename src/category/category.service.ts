@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { InjectModel } from '@nestjs/mongoose';
 import { Category } from './entities/category.entity';
-import { Model } from 'mongoose';
 
 @Injectable()
 export class CategoryService {
@@ -22,7 +22,7 @@ export class CategoryService {
 
   private async existCategoryWithName(name: string) {
     const existCategory = await this.categoryModel.exists({ name });
-    if(existCategory)
+    if (existCategory)
       throw new BadRequestException(`Exist category with name: ${name}`);
   }
 
@@ -32,10 +32,17 @@ export class CategoryService {
       return category;
     throw new BadRequestException(`Not exist category with id: ${id}`);
   }
-  
-  async existCategoryWithId(id: string){
-    const existCategory = await this.categoryModel.exists({id});
-    if(!existCategory)
+  async existAllCategoriesWithIds(categories: string[]) {
+    if (categories) {
+      for (const categoryId of categories) {
+        await this.existCategoryWithId(categoryId);
+      }
+    }
+  }
+
+  private async existCategoryWithId(id: string) {
+    const existCategory = await this.categoryModel.exists({ _id: id });
+    if (!existCategory)
       throw new BadRequestException(`Not exist category with id: ${id}`);
   }
 
