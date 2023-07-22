@@ -1,7 +1,7 @@
 import { IsMongoId, IsNumber, IsOptional, IsString, Min, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 import { CreateAdditionOrderDto } from './create-addition-order.dto';
-import { IsNonPrimitiveArray } from "src/decorators/isNonPrimitive.decorator";
+import { IsNonPrimitiveArray } from "src/common/decorators/isNonPrimitive.decorator";
 
 export class CreateSweetOrderDto {
 

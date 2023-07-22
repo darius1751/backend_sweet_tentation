@@ -3,10 +3,10 @@ import { SweetService } from './sweet.service';
 import { UpdateSweetDto } from './dto/update-sweet.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateSweetDto } from './dto/create-sweet.dto';
-import { validateFile } from 'src/utils/validateFile';
+import { validateFile } from 'src/common/utils/validateFile';
 import { CreateSweetImagesDto } from './dto/create-sweet-images.dto';
-import { CreateWithFileErrorFilter } from 'src/filters/create-with-file-error/create-with-file-error.filter';
-import { MongoIdPipe } from 'src/pipes/mongo-id/mongo-id.pipe';
+import { CreateWithFileErrorFilter } from 'src/common/filters/create-with-file-error/create-with-file-error.filter';
+import { MongoIdPipe } from 'src/common/pipes/mongo-id/mongo-id.pipe';
 
 @Controller('sweet')
 export class SweetController {

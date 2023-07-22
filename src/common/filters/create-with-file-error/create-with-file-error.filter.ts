@@ -17,6 +17,5 @@ export class CreateWithFileErrorFilter implements ExceptionFilter {
     response
       .status(status)
       .json(exception.getResponse());
-
   }
 }

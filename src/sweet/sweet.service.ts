@@ -7,9 +7,9 @@ import { UpdateSweetDto } from './dto/update-sweet.dto';
 import { CreateSweetImagesDto } from './dto/create-sweet-images.dto';
 import { UpdateSweetImagesDto } from './dto/update-sweet-images.dto';
 import { CategoryService } from 'src/category/category.service';
-import { removeImage } from 'src/utils/removeImage';
-import { removeLocalImages } from 'src/utils/removeLocateImages';
-import { saveImages } from 'src/utils/saveImages';
+import { removeImage } from 'src/common/utils/removeImage';
+import { removeLocalImages } from 'src/common/utils/removeLocateImages';
+import { saveImages } from 'src/common/utils/saveImages';
 
 @Injectable()
 export class SweetService {

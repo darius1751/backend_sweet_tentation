@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe 
 import { CreateNoveltyDto } from './dto/create-novelty.dto';
 import { UpdateNoveltyDto } from './dto/update-novelty.dto';
 import { NoveltyService } from './novelty.service';
-import { MongoIdPipe } from 'src/pipes/mongo-id/mongo-id.pipe';
+import { MongoIdPipe } from 'src/common/pipes/mongo-id/mongo-id.pipe';
 
 @Controller('novelty')
 export class NoveltyController {
