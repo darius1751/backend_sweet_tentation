@@ -13,6 +13,7 @@ import { SweetModule } from 'src/sweet/sweet.module';
     SweetModule
   ],
   controllers: [OfferController],
-  providers: [OfferService]
+  providers: [OfferService],
+  exports: [OfferService]
 })
 export class OfferModule { }

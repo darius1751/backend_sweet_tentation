@@ -13,6 +13,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { AdditionModule } from './addition/addition.module';
 import { OfferModule } from './offer/offer.module';
 import { NoveltyModule } from './novelty/novelty.module';
+import { OrderModule } from './order/order.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -27,7 +28,8 @@ import { NoveltyModule } from './novelty/novelty.module';
     CategoryModule,
     AdditionModule,
     OfferModule,
-    NoveltyModule
+    NoveltyModule,
+    OrderModule
   ],
   controllers: [AppController],
   providers: [AppService],

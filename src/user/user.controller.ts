@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginCredentialDto } from 'src/credential/dto/login-credential.dto';
-import { MongoIdPipe } from 'src/pipe/mongo-id/mongo-id.pipe';
+import { MongoIdPipe } from 'src/pipes/mongo-id/mongo-id.pipe';
 
 @Controller('user')
 export class UserController {

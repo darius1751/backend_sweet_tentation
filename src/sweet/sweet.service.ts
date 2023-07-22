@@ -22,7 +22,7 @@ export class SweetService {
   async create(createSweetImagesDto: CreateSweetImagesDto, createSweetDto: CreateSweetDto) {
     const { title, categories } = createSweetDto;
     await this.existSweetWithTitle(title);
-    await this.categoryService.existAllCategoriesWithIds(categories);
+    await this.categoryService.existAllWithIds(categories);
     const { mainImage, images } = createSweetImagesDto;
     if (!mainImage)
       throw new BadRequestException(`not send mainImage of the sweet`);
@@ -42,13 +42,14 @@ export class SweetService {
     if (existSweet)
       throw new BadRequestException(`Sweet with title: ${title} exist.`);
   }
+
   private async existSweetWithId(id: string) {
     const existSweet = await this.sweetModel.exists({ _id: id });
     if (!existSweet)
       throw new BadRequestException(`Sweet with id ${id} not exist.`);
   }
 
-  async existAllSweetsWithIds(sweetsIds: string[]) {
+  async existAllWithIds(sweetsIds: string[]) {
     if (sweetsIds) {
       for (const sweetId of sweetsIds) {
         await this.existSweetWithId(sweetId);

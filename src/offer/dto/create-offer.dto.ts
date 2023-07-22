@@ -1,4 +1,10 @@
-import { IsDateString, IsNumberString, IsOptional, IsString } from "class-validator";
+import { BadRequestException } from "@nestjs/common";
+import { Transform } from "class-transformer";
+import { IsDateString, IsNumberString, IsOptional, IsString, isMongoId } from "class-validator";
+import { transformMongoId } from "src/utils/transformMongoId";
+
+
+// import { ParseMongoIdArray } from "src/parseMongoIdArray";
 
 export class CreateOfferDto {
 
@@ -15,17 +21,17 @@ export class CreateOfferDto {
      * Separation with ; 
      * and mongoId's
      * */
-    @IsString()
     @IsOptional()
-    public readonly categories?: string;
+    @Transform(transformMongoId, { toPlainOnly: true })
+    public readonly categories?: string[];
 
     /**
      * Separation with ;
      * and mongoId's 
      * */
     @IsOptional()
-    @IsString()
-    public readonly sweets?: string;
+    @Transform(transformMongoId, { toPlainOnly: true })
+    public readonly sweets?: string[];
 
     @IsString()
     @IsOptional()

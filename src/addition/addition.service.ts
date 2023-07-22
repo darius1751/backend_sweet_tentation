@@ -49,9 +49,9 @@ export class AdditionService {
 
   async findOneById(id: string) {
     const addition = await this.additionModel.findById(id);
-    if (addition)
-      return addition;
-    throw new BadRequestException(`Not exist addition with id: ${id}`);
+      if (addition)
+        return addition;
+      throw new BadRequestException(`Not exist addition with id: ${id}`);   
   }
 
   async update(id: string, updateAdditionDto: UpdateAdditionDto) {
