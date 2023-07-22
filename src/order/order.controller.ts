@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe 
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { MongoIdPipe } from 'src/pipes/mongo-id/mongo-id.pipe';
+import { MongoIdPipe } from 'src/common/pipes/mongo-id/mongo-id.pipe';
 
 @Controller('order')
 export class OrderController {

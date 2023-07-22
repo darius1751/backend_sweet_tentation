@@ -2,11 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe,
 import { OfferService } from './offer.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
-import { MongoIdPipe } from 'src/pipes/mongo-id/mongo-id.pipe';
+import { MongoIdPipe } from 'src/common/pipes/mongo-id/mongo-id.pipe';
 import { CreateOfferImagesDto } from './dto/create-offer-images.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { CreateWithFileErrorFilter } from 'src/filters/create-with-file-error/create-with-file-error.filter';
-import { validateFile } from 'src/utils/validateFile';
+import { CreateWithFileErrorFilter } from 'src/common/filters/create-with-file-error/create-with-file-error.filter';
+import { validateFile } from 'src/common/utils/validateFile';
 
 @Controller('offer')
 export class OfferController {

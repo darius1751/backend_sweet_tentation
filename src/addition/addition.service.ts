@@ -2,8 +2,8 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { join } from 'path';
-import { saveImage } from 'src/utils/saveImage';
-import { removeImage } from 'src/utils/removeImage';
+import { saveImage } from 'src/common/utils/saveImage';
+import { removeImage } from 'src/common/utils/removeImage';
 import { CreateAdditionDto } from './dto/create-addition.dto';
 import { UpdateAdditionDto } from './dto/update-addition.dto';
 import { Addition } from './entities/addition.entity';

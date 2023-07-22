@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { RoleService } from './role.service';
-import { MongoIdPipe } from 'src/pipes/mongo-id/mongo-id.pipe';
+import { MongoIdPipe } from 'src/common/pipes/mongo-id/mongo-id.pipe';
 
 @Controller('role')
 export class RoleController {

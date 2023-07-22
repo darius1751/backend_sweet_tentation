@@ -14,6 +14,7 @@ import { AdditionModule } from './addition/addition.module';
 import { OfferModule } from './offer/offer.module';
 import { NoveltyModule } from './novelty/novelty.module';
 import { OrderModule } from './order/order.module';
+import { CommonModule } from './common/common.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -29,7 +30,8 @@ import { OrderModule } from './order/order.module';
     AdditionModule,
     OfferModule,
     NoveltyModule,
-    OrderModule
+    OrderModule,
+    CommonModule
   ],
   controllers: [AppController],
   providers: [AppService],
