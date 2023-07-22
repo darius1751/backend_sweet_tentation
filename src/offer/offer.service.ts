@@ -22,26 +22,21 @@ export class OfferService {
 
   async create(createOfferImagesDto: CreateOfferImagesDto, createOfferDto: CreateOfferDto) {
     const { title, categories, newPrice, normalPrice, sweets } = createOfferDto;
-    
     const { mainImage, images } = createOfferImagesDto;
     const discount = await this.calculateDiscount(normalPrice, newPrice);
-    let sweetsSave = [];
-    let categoriesSave = [];
     if (!mainImage)
       throw new BadRequestException(`not send mainImage of the offer`);
     await this.existOfferWithTitle(title);
     if (sweets) {
-      sweetsSave = sweets.split(";");
-      await this.sweetService.existAllSweetsWithIds(sweetsSave);
+      await this.sweetService.existAllWithIds(sweets);
     }
     if (categories) {
-      categoriesSave = categories.split(";");
-      await this.categoryService.existAllCategoriesWithIds(categoriesSave);
+      await this.categoryService.existAllWithIds(categories);
     }
     try {
       const { mainImageSecureURL, imagesSecureURL } = await saveImages({ folder: "offers", title }, mainImage[0], images);
       await removeLocalImages([...images, mainImage[0]]);
-      return await this.offerModel.create({ ...createOfferDto, categories: categoriesSave, sweets: sweetsSave, discount, mainImage: mainImageSecureURL, images: imagesSecureURL });
+      return await this.offerModel.create({ ...createOfferDto, categories, sweets, discount, mainImage: mainImageSecureURL, images: imagesSecureURL });
     } catch (exception) {
       throw new InternalServerErrorException(`${exception.message}`);
     }
@@ -60,6 +55,20 @@ export class OfferService {
     const offer = await this.offerModel.exists({ title });
     if (offer)
       throw new BadRequestException(`Exist offer with title: ${title}`);
+  }
+
+  private async existOfferWithId(id: string) {
+    const existOffer = await this.offerModel.exists({ _id: id, active: true });
+    if (!existOffer)
+      throw new BadRequestException(`Sweet with id ${id} not exist.`);
+  }
+
+  async existAllWithIds(offersIds: string[]) {
+    if (offersIds) {
+      for (const offerId of offersIds) {
+        await this.existOfferWithId(offerId);
+      }
+    }
   }
 
   async findAll(skip: number, take: number) {

@@ -12,7 +12,7 @@ export class CategoryService {
 
   async create(createCategoryDto: CreateCategoryDto) {
     const { name } = createCategoryDto;
-    await this.existCategoryWithName(name);
+    await this.existWithName(name);
     return this.categoryModel.create(createCategoryDto);
   }
 
@@ -20,7 +20,7 @@ export class CategoryService {
     return await this.categoryModel.find();
   }
 
-  private async existCategoryWithName(name: string) {
+  private async existWithName(name: string) {
     const existCategory = await this.categoryModel.exists({ name });
     if (existCategory)
       throw new BadRequestException(`Exist category with name: ${name}`);
@@ -32,15 +32,15 @@ export class CategoryService {
       return category;
     throw new BadRequestException(`Not exist category with id: ${id}`);
   }
-  async existAllCategoriesWithIds(categories: string[]) {
+  async existAllWithIds(categories: string[]) {
     if (categories) {
       for (const categoryId of categories) {
-        await this.existCategoryWithId(categoryId);
+        await this.existWithId(categoryId);
       }
     }
   }
 
-  private async existCategoryWithId(id: string) {
+  private async existWithId(id: string) {
     const existCategory = await this.categoryModel.exists({ _id: id });
     if (!existCategory)
       throw new BadRequestException(`Not exist category with id: ${id}`);

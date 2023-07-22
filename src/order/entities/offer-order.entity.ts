@@ -1,13 +1,13 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { AdditionOrder, AdditionOrderSchema, AdditionOrderType } from "./addition-order.entity";
 import { Document, SchemaTypes } from "mongoose";
-import { Sweet } from "src/sweet/entities/sweet.entity";
+import { AdditionOrder, AdditionOrderSchema, AdditionOrderType } from "./addition-order.entity";
+import { Offer } from "src/offer/entities/offer.entity";
 
 @Schema({ versionKey: false })
-export class SweetOrder extends Document {
+export class OfferOrder extends Document {
 
-    @Prop({ required: true, type: SchemaTypes.ObjectId, ref: Sweet.name })
-    public readonly sweet: string;
+    @Prop({ required: true, type: SchemaTypes.ObjectId, ref: Offer.name })
+    public readonly offer: string;
 
     @Prop({ required: true })
     public readonly title: string;
@@ -28,14 +28,14 @@ export class SweetOrder extends Document {
     public readonly observations: string;
 }
 
-export const SweetOrderSchema = SchemaFactory.createForClass(SweetOrder);
+export const OfferOrderSchema = SchemaFactory.createForClass(OfferOrder);
 
-export type SweetOrderType = {
-    sweet: string,
+export type OfferOrderType = {
+    offer: string,
     title: string,
     price: number,
     cant: number,
-    additions?: AdditionOrderType[],
+    additions: AdditionOrderType[],
     totalToPay: number,
     observations?: string
 }

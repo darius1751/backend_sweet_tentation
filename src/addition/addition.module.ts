@@ -7,6 +7,7 @@ import { Addition, AdditionSchema } from './entities/addition.entity';
 @Module({
   imports: [MongooseModule.forFeature([{ name: Addition.name, schema: AdditionSchema }])],
   controllers: [AdditionController],
-  providers: [AdditionService]
+  providers: [AdditionService],
+  exports: [AdditionService]
 })
 export class AdditionModule { }

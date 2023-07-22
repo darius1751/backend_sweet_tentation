@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, ParseIntPipe, UseFilters, Query } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { validateFile } from 'src/utils/validateFile';
-import { MongoIdPipe } from 'src/pipe/mongo-id/mongo-id.pipe';
+import { MongoIdPipe } from 'src/pipes/mongo-id/mongo-id.pipe';
 import { CreateAdditionDto } from './dto/create-addition.dto';
 import { UpdateAdditionDto } from './dto/update-addition.dto';
 import { AdditionService } from './addition.service';
