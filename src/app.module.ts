@@ -12,12 +12,13 @@ import { CategoryModule } from './category/category.module';
 import { v2 as cloudinary } from 'cloudinary';
 import { AdditionModule } from './addition/addition.module';
 import { OfferModule } from './offer/offer.module';
+import { NoveltyModule } from './novelty/novelty.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
     MongooseModule.forRoot(`mongodb://${process.env.MONGO_USERNAME}:${env.MONGO_PASSWORD}@db:27017/`,{
       dbName:env.MONGO_DATABASE,
-      directConnection:true,      
+      directConnection:true,
     }),
     CredentialModule,
     UserModule,
@@ -25,7 +26,8 @@ import { OfferModule } from './offer/offer.module';
     SweetModule,
     CategoryModule,
     AdditionModule,
-    OfferModule
+    OfferModule,
+    NoveltyModule
   ],
   controllers: [AppController],
   providers: [AppService],
