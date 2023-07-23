@@ -15,6 +15,7 @@ import { OfferModule } from './offer/offer.module';
 import { NoveltyModule } from './novelty/novelty.module';
 import { OrderModule } from './order/order.module';
 import { CommonModule } from './common/common.module';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -31,7 +32,8 @@ import { CommonModule } from './common/common.module';
     OfferModule,
     NoveltyModule,
     OrderModule,
-    CommonModule
+    CommonModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
