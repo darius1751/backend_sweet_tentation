@@ -19,5 +19,5 @@ export class CreateUserDto {
     public readonly address: string;
 
     @IsMongoId()
-    public readonly roleId: string;
+    public readonly role: string;
 }

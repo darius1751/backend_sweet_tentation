@@ -2,12 +2,12 @@ import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/com
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './entities/user.entity';
-import { CredentialService } from 'src/credential/credential.service';
-import { RoleService } from 'src/role/role.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginCredentialDto } from 'src/credential/dto/login-credential.dto';
 import { AuthService } from 'src/auth/auth.service';
+import { CredentialService } from 'src/credential/credential.service';
+import { RoleService } from 'src/role/role.service';
 
 @Injectable()
 export class UserService {
@@ -22,17 +22,17 @@ export class UserService {
   async login(loginCredentialDto: LoginCredentialDto) {
     const credentialId = await this.credentialService.login(loginCredentialDto);
     const user = await this.userModel.findOne({ credentialId, active: true }, { credentialId: false });
-    if (user){
-      const accessToken = await this.authService.createAccessToken({ user: loginCredentialDto.user, roleId: user.roleId })
-      return { ...user, accessToken };
+    if (user) {
+      const accessToken = await this.authService.createAccessToken({ user: loginCredentialDto.user, role: user.role })
+      return { user, access_token: accessToken };
     }
     throw new ForbiddenException(`User not active or not exist`);
   }
 
   async create(createUserDto: CreateUserDto) {
-    const { email, credential, phone, roleId } = createUserDto;
+    const { email, credential, phone, role } = createUserDto;
     await this.validateEmailAndPhone(email, phone);
-    await this.roleService.findOneById(roleId);
+    await this.roleService.findOneById(role);
     try {
       const { _id } = await this.credentialService.create(credential);
       return await this.userModel.create({ ...createUserDto, credentialId: _id });

@@ -1,4 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { SchemaTypes } from "mongoose";
+import { Role } from "src/role/entities/role.entity";
 
 @Schema({ versionKey: false })
 export class User {
@@ -15,8 +17,8 @@ export class User {
     @Prop({ required: true })
     public readonly address: string;
 
-    @Prop({ required: true })
-    public readonly roleId: string;
+    @Prop({ required: true, type: SchemaTypes.ObjectId, ref: Role.name })
+    public readonly role: string;
 
     @Prop({ unique: true, required: true })
     public readonly credentialId: string;

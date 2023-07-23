@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -17,6 +17,7 @@ import { OrderModule } from './order/order.module';
 import { CommonModule } from './common/common.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtMiddleware } from './common/jwt/jwt.middleware';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,7 +26,7 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule.register({
       global: true,
       secret: env.JWT_SECRET_KEY,
-      signOptions: { algorithm: 'HS256', expiresIn: '5h' }
+      signOptions: { algorithm: 'HS256', expiresIn: '5h', mutatePayload: false }      
     }),
     MongooseModule.forRoot(`mongodb://${process.env.MONGO_USERNAME}:${env.MONGO_PASSWORD}@db:27017/`, {
       dbName: env.MONGO_DATABASE,
@@ -46,7 +47,8 @@ import { JwtModule } from '@nestjs/jwt';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
+export class AppModule implements NestModule {
+
   constructor() {
     cloudinary.config({
       cloud_name: env.CLOUD_NAME,
@@ -54,4 +56,10 @@ export class AppModule {
       api_secret: env.CLOUD_API_SECRET
     });
   }
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(JwtMiddleware)
+      .forRoutes(AppController)
+  }
+
 }
