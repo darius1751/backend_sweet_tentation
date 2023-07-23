@@ -15,12 +15,21 @@ import { OfferModule } from './offer/offer.module';
 import { NoveltyModule } from './novelty/novelty.module';
 import { OrderModule } from './order/order.module';
 import { CommonModule } from './common/common.module';
+import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    MongooseModule.forRoot(`mongodb://${process.env.MONGO_USERNAME}:${env.MONGO_PASSWORD}@db:27017/`,{
-      dbName:env.MONGO_DATABASE,
-      directConnection:true,
+    ConfigModule.forRoot({
+      isGlobal: true
+    }),
+    JwtModule.register({
+      global: true,
+      secret: env.JWT_SECRET_KEY,
+      signOptions: { algorithm: 'HS256', expiresIn: '5h' }
+    }),
+    MongooseModule.forRoot(`mongodb://${process.env.MONGO_USERNAME}:${env.MONGO_PASSWORD}@db:27017/`, {
+      dbName: env.MONGO_DATABASE,
+      directConnection: true,
     }),
     CredentialModule,
     UserModule,
@@ -31,16 +40,17 @@ import { CommonModule } from './common/common.module';
     OfferModule,
     NoveltyModule,
     OrderModule,
-    CommonModule
+    CommonModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule{
-  constructor(){
-    cloudinary.config({ 
-      cloud_name: env.CLOUD_NAME, 
-      api_key: env.CLOUD_API_KEY, 
+export class AppModule {
+  constructor() {
+    cloudinary.config({
+      cloud_name: env.CLOUD_NAME,
+      api_key: env.CLOUD_API_KEY,
       api_secret: env.CLOUD_API_SECRET
     });
   }
