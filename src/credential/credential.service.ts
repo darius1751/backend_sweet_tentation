@@ -14,32 +14,38 @@ export class CredentialService {
     @InjectModel(Credential.name) private readonly credentialModel: Model<Credential>
   ) { }
 
-  async create({ user, password }: CreateCredentialDto) {
+  async create(createCredentialDto: CreateCredentialDto) {
+    const { user, password } = createCredentialDto;
+    await this.notExistWithUser(user);
     try {
-      const existUser = await this.existUser(user);
-      if (!existUser)
-        return await this.credentialModel.create({ user, password: hashSync(password, 10) });
-      throw new BadRequestException(`Error in create user, username: ${user} exist`);
+      return await this.credentialModel.create({ user, password: hashSync(password, 10) });
     } catch (exception) {
       throw new BadRequestException(exception.message);
     }
   }
 
-  private async existUser(user: string) {
+  async login(loginCredentialDto: LoginCredentialDto) {
+    const { user, password } = loginCredentialDto;
+    await this.existWithUser(user);
+    const credential = await this.credentialModel.findOne({ user });
+    if (compareSync(password, credential.password))
+      return credential._id;
+    throw new ForbiddenException(`Error in login`);
+
+  }
+
+  private async existWithUser(user: string) {
     const existUser = await this.credentialModel.exists({ user });
-    return existUser != null;
+    if (!existUser)
+      throw new BadRequestException(`Not exist user: ${user}`);
   }
 
-  async login({ user, password }: LoginCredentialDto) {
-    const existUser = await this.existUser(user);
-    if (existUser) {
-      const credential = await this.credentialModel.findOne({ user });
-      if (compareSync(password, credential.password))
-        return credential._id;
-      throw new ForbiddenException(`Error in login`);
-    }
+  private async notExistWithUser(user: string) {
+    const existUser = await this.credentialModel.exists({ user });
+    if (existUser)
+      throw new BadRequestException(`Exist user: ${user}`);
   }
-
+  
   private async findOneById(id: string) {
     const credential = await this.credentialModel.findById(id);
     if (credential)

@@ -1,4 +1,6 @@
+import { Transform } from "class-transformer";
 import { IsNumberString, IsOptional, IsString } from "class-validator";
+import { transformMongoIdArray } from "src/common/utils/transformMongoIdArray";
 
 export class CreateSweetDto {
 
@@ -9,6 +11,7 @@ export class CreateSweetDto {
     public readonly price: number;
 
     @IsString()
+    @Transform(transformMongoIdArray)
     @IsOptional()
     public readonly categories?: string[];
 

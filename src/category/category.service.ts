@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -12,18 +12,23 @@ export class CategoryService {
 
   async create(createCategoryDto: CreateCategoryDto) {
     const { name } = createCategoryDto;
-    await this.existWithName(name);
-    return this.categoryModel.create(createCategoryDto);
+    await this.notExistWithName(name);
+    try{
+      return this.categoryModel.create(createCategoryDto);
+    }catch(exception){
+      throw new InternalServerErrorException(`Error in create category: ${exception.message}`);
+    }
+    
+  }
+
+  private async notExistWithName(name: string) {
+    const existCategory = await this.categoryModel.exists({ name });
+    if (existCategory)
+      throw new BadRequestException(`Exist category with name: ${name}`);
   }
 
   async findAll() {
     return await this.categoryModel.find();
-  }
-
-  private async existWithName(name: string) {
-    const existCategory = await this.categoryModel.exists({ name });
-    if (existCategory)
-      throw new BadRequestException(`Exist category with name: ${name}`);
   }
 
   async findOneById(id: string) {

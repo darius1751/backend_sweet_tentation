@@ -18,7 +18,7 @@ export class AdditionService {
 
   async create(image: Express.Multer.File, createAdditionDto: CreateAdditionDto) {
     const { name } = createAdditionDto;
-    await this.existAdditionWithName(name);
+    await this.notExistWithName(name);
     try {
       const { path } = image;
       const imageSecureURL = await saveImage(path, join('additions', name));
@@ -29,7 +29,7 @@ export class AdditionService {
     }
   }
 
-  private async existAdditionWithName(name: string) {
+  private async notExistWithName(name: string) {
     const existAddition = await this.additionModel.exists({ name });
     if (existAddition)
       throw new BadRequestException(`Addition with name ${name} exist`);

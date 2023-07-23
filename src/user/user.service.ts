@@ -26,12 +26,13 @@ export class UserService {
       const accessToken = await this.authService.createAccessToken({ user: loginCredentialDto.user, role: user.role })
       return { user, access_token: accessToken };
     }
-    throw new ForbiddenException(`User not active or not exist`);
+    throw new ForbiddenException(`User ${loginCredentialDto.user} not active or not exist`);
   }
 
   async create(createUserDto: CreateUserDto) {
     const { email, credential, phone, role } = createUserDto;
-    await this.validateEmailAndPhone(email, phone);
+    await this.notExistEmail(email);
+    await this.notExistPhone(phone);
     await this.roleService.findOneById(role);
     try {
       const { _id } = await this.credentialService.create(credential);
@@ -41,23 +42,16 @@ export class UserService {
     }
   }
 
-  private async validateEmailAndPhone(email: string, phone: string) {
-    const existEmail = await this.existEmail(email);
-    if (existEmail)
-      throw new BadRequestException(`Email: ${email} exist in db`);
-    const existPhone = await this.existPhone(phone);
-    if (existPhone)
-      throw new BadRequestException(`Phone: ${phone} exist in db`);
-  }
-
-  private async existEmail(email: string) {
+  private async notExistEmail(email: string) {
     const existEmail = await this.userModel.exists({ email });
-    return existEmail != null;
+    if (existEmail)
+      throw new BadRequestException(`Exist user with email: ${email}`);
   }
 
-  private async existPhone(phone: string) {
+  private async notExistPhone(phone: string) {
     const existPhone = await this.userModel.exists({ phone });
-    return existPhone != null;
+    if (existPhone)
+      throw new BadRequestException(`Exist user with phone: ${phone}`);
   }
 
   async findAll(skip: number, take: number) {

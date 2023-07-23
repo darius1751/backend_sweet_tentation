@@ -1,4 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { SchemaTypes } from "mongoose";
+import { Permission } from "src/permission/entities/permission.entity";
 
 @Schema({ versionKey: false })
 export class Role {
@@ -9,6 +11,9 @@ export class Role {
     @Prop({ required: true })
     public readonly description: string;
 
+    @Prop([{ type: SchemaTypes.ObjectId, ref: Permission.name }])
+    public readonly permissions: string[];
+    
 }
 
 export const RoleSchema = SchemaFactory.createForClass(Role);

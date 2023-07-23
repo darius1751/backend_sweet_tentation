@@ -17,16 +17,16 @@ export class NoveltyService {
   async create(createNoveltyDto: CreateNoveltyDto) {
     const { sweet } = createNoveltyDto;
     await this.sweetService.findOneById(sweet);
-    await this.existNoveltyWithSweetId(sweet);
+    await this.notExistWithSweetId(sweet);
     try {
       return await this.noveltyModel.create(createNoveltyDto);
     } catch (exception) {
       throw new InternalServerErrorException(`Error in create novelty ${exception.message}`);
     }
   }
-  
-  private async existNoveltyWithSweetId(id: string) {
-    const novelty = await this.noveltyModel.findOne({ sweet: id });
+
+  private async notExistWithSweetId(id: string) {
+    const novelty = await this.noveltyModel.exists({ sweet: id });
     if (novelty)
       throw new BadRequestException(`Exist novelty of the sweet with id: ${id}`);
   }
@@ -44,6 +44,9 @@ export class NoveltyService {
 
   async update(id: string, updateNoveltyDto: UpdateNoveltyDto) {
     await this.findOneById(id);
+    const { sweet } = updateNoveltyDto;
+    if(sweet)
+      await this.notExistWithSweetId(sweet);
     try {
       return this.noveltyModel.findByIdAndUpdate(id, { ...updateNoveltyDto, updatedAt: Date.now() });
     } catch (exception) {

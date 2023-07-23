@@ -18,6 +18,7 @@ import { CommonModule } from './common/common.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtMiddleware } from './common/jwt/jwt.middleware';
+import { PermissionModule } from './permission/permission.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -42,7 +43,8 @@ import { JwtMiddleware } from './common/jwt/jwt.middleware';
     NoveltyModule,
     OrderModule,
     CommonModule,
-    AuthModule
+    AuthModule,
+    PermissionModule
   ],
   controllers: [AppController],
   providers: [AppService],
