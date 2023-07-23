@@ -7,6 +7,7 @@ import { RoleService } from 'src/role/role.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginCredentialDto } from 'src/credential/dto/login-credential.dto';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
@@ -14,15 +15,18 @@ export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly credentialService: CredentialService,
-    private readonly roleService: RoleService
+    private readonly roleService: RoleService,
+    private readonly authService: AuthService
   ) { }
 
   async login(loginCredentialDto: LoginCredentialDto) {
     const credentialId = await this.credentialService.login(loginCredentialDto);
     const user = await this.userModel.findOne({ credentialId, active: true }, { credentialId: false });
-    if (user)
-      return user;
-    throw new ForbiddenException(`User not active`);
+    if (user){
+      const accessToken = await this.authService.createAccessToken({ user: loginCredentialDto.user, roleId: user.roleId })
+      return { ...user, accessToken };
+    }
+    throw new ForbiddenException(`User not active or not exist`);
   }
 
   async create(createUserDto: CreateUserDto) {
@@ -76,7 +80,7 @@ export class UserService {
     try {
       return this.userModel.findByIdAndUpdate(id, updateUserDto);
     } catch (exception) {
-      throw new BadRequestException(`Error in update`);
+      throw new BadRequestException(`Error in update user`);
     }
   }
 
