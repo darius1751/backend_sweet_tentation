@@ -7,12 +7,15 @@ import { CreateOfferImagesDto } from './dto/create-offer-images.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateWithFileErrorFilter } from 'src/common/filters/create-with-file-error/create-with-file-error.filter';
 import { validateFile } from 'src/common/utils/validateFile';
+import { RequirePermission } from 'src/common/decorators/requirePermission.decorator';
+import { Permission } from 'src/common/permission.enum';
 
 @Controller('offer')
 export class OfferController {
 
   constructor(private readonly offerService: OfferService) { }
 
+  @RequirePermission(Permission.CREATE_OFFER)
   @Post()
   @UseFilters(CreateWithFileErrorFilter)
   @UseInterceptors(
@@ -49,11 +52,13 @@ export class OfferController {
     return this.offerService.findOneById(id);
   }
 
+  @RequirePermission(Permission.UPDATE_OFFER)
   @Patch(':id')
   update(@Param('id', MongoIdPipe) id: string, @Body() updateOfferDto: UpdateOfferDto) {
     return this.offerService.update(id, updateOfferDto);
   }
 
+  @RequirePermission(Permission.DELETE_OFFER)
   @Delete(':id')
   remove(@Param('id', MongoIdPipe) id: string) {
     return this.offerService.remove(id);

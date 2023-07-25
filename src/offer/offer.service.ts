@@ -26,7 +26,7 @@ export class OfferService {
     const discount = await this.calculateDiscount(normalPrice, newPrice);
     if (!mainImage)
       throw new BadRequestException(`not send mainImage of the offer`);
-    await this.existOfferWithTitle(title);
+    await this.existWithTitle(title);
     if (sweets) {
       await this.sweetService.existAllWithIds(sweets);
     }
@@ -51,13 +51,13 @@ export class OfferService {
       throw new InternalServerErrorException(`Error in calculate discount: ${exception.message}`);
     }
   }
-  private async existOfferWithTitle(title: string) {
+  private async existWithTitle(title: string) {
     const offer = await this.offerModel.exists({ title });
     if (offer)
       throw new BadRequestException(`Exist offer with title: ${title}`);
   }
 
-  private async existOfferWithId(id: string) {
+  private async existWithId(id: string) {
     const existOffer = await this.offerModel.exists({ _id: id, active: true });
     if (!existOffer)
       throw new BadRequestException(`Sweet with id ${id} not exist.`);
@@ -66,14 +66,20 @@ export class OfferService {
   async existAllWithIds(offersIds: string[]) {
     if (offersIds) {
       for (const offerId of offersIds) {
-        await this.existOfferWithId(offerId);
+        await this.existWithId(offerId);
       }
     }
   }
 
   async findAll(skip: number, take: number) {
     try {
-      return await this.offerModel.find({}, {}, { skip, limit: take });
+      const offers = await this.offerModel.find({}, {}, { skip, limit: take });
+      const formattedOffers = [];
+      for (const { id } of offers){
+        const offer = await this.findOneById(id);
+        formattedOffers.push(offer);
+      }
+        return formattedOffers;
     } catch (exception) {
       throw new BadRequestException(`skip and take must be int positive`);
     }
@@ -81,13 +87,46 @@ export class OfferService {
 
   async findOneById(id: string) {
     const offer = await this.offerModel.findById(id);
-    if (offer)
-      return offer;
+    if (offer) {
+      const { normalPrice, newPrice, mainImage, images, title, active, discount, sweets: sweetsIds, categories: categoriesIds, description, limitTime, createdAt } = offer;
+      const sweets = [];
+      const categories = [];
+      for (const sweetId of sweetsIds) {
+        sweets.push(this.sweetService.findOneById(sweetId))
+      }
+      for (const categoryId of categoriesIds) {
+        categories.push(this.categoryService.findOneById(categoryId))
+      }
+      return {
+        id,
+        title,
+        limitTime,
+        mainImage,
+        images,
+        normalPrice,
+        newPrice,
+        discount,
+        active,
+        sweets,
+        categories,
+        description,
+        createdAt
+      };
+    }
     throw new BadRequestException(`Not exist offer with id: ${id}`);
   }
 
   async update(id: string, updateOfferDto: UpdateOfferDto) {
     await this.findOneById(id);
+    const { sweets, categories, title } = updateOfferDto;
+    if (title)
+      await this.existWithTitle(title);
+    if (sweets) {
+      await this.sweetService.existAllWithIds(sweets);
+    }
+    if (categories) {
+      await this.categoryService.existAllWithIds(categories);
+    }
     try {
       return await this.offerModel.findByIdAndUpdate(id, updateOfferDto);
     } catch (exception) {

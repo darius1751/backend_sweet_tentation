@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { JwtModule } from '@nestjs/jwt';
+import { RoleModule } from 'src/role/role.module';
 
 @Module({
-    imports:[JwtModule],
+    imports: [RoleModule],
     providers: [AuthService],
-    exports: [AuthService]
+    exports: [AuthService],
+
 })
 export class AuthModule { }

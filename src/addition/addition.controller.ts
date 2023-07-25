@@ -6,11 +6,14 @@ import { CreateAdditionDto } from './dto/create-addition.dto';
 import { UpdateAdditionDto } from './dto/update-addition.dto';
 import { AdditionService } from './addition.service';
 import { CreateWithFileErrorFilter } from 'src/common/filters/create-with-file-error/create-with-file-error.filter';
+import { RequirePermission } from 'src/common/decorators/requirePermission.decorator';
+import { Permission } from 'src/common/permission.enum';
 
 @Controller('addition')
 export class AdditionController {
   constructor(private readonly additionService: AdditionService) { }
 
+  @RequirePermission(Permission.CREATE_ADDITION)
   @Post()
   @UseInterceptors(FileInterceptor('image', {
     dest: './temp',
@@ -34,16 +37,19 @@ export class AdditionController {
     return this.additionService.findAll(skip, take);
   }
 
+  
   @Get(':id')
   findOneById(@Param('id', MongoIdPipe) id: string) {
     return this.additionService.findOneById(id);
   }
 
+  @RequirePermission(Permission.UPDATE_ADDITION)
   @Patch(':id')
   update(@Param('id', MongoIdPipe) id: string, @Body() updateAdditionDto: UpdateAdditionDto) {
     return this.additionService.update(id, updateAdditionDto);
   }
 
+  @RequirePermission(Permission.DELETE_ADDITION)
   @Delete(':id')
   remove(@Param('id', MongoIdPipe) id: string) {
     return this.additionService.remove(id);

@@ -21,7 +21,7 @@ export class SweetService {
 
   async create(createSweetImagesDto: CreateSweetImagesDto, createSweetDto: CreateSweetDto) {
     const { title, categories } = createSweetDto;
-    await this.existSweetWithTitle(title);
+    await this.notExistWithTitle(title);
     await this.categoryService.existAllWithIds(categories);
     const { mainImage, images } = createSweetImagesDto;
     if (!mainImage)
@@ -37,13 +37,13 @@ export class SweetService {
     }
   }
 
-  private async existSweetWithTitle(title: string) {
+  private async notExistWithTitle(title: string) {
     const existSweet = await this.sweetModel.exists({ title });
     if (existSweet)
       throw new BadRequestException(`Sweet with title: ${title} exist.`);
   }
 
-  private async existSweetWithId(id: string) {
+  private async existWithId(id: string) {
     const existSweet = await this.sweetModel.exists({ _id: id });
     if (!existSweet)
       throw new BadRequestException(`Sweet with id ${id} not exist.`);
@@ -52,7 +52,7 @@ export class SweetService {
   async existAllWithIds(sweetsIds: string[]) {
     if (sweetsIds) {
       for (const sweetId of sweetsIds) {
-        await this.existSweetWithId(sweetId);
+        await this.existWithId(sweetId);
       }
     }
   }
@@ -68,8 +68,23 @@ export class SweetService {
 
   async findOneById(id: string) {
     const sweet = await this.sweetModel.findById(id);
-    if (sweet)
-      return sweet;
+    if (sweet) {
+      const { title, price, mainImage, images, categories: categoriesIds, description } = sweet;
+      const categories = [];
+      for(const categoryId of categoriesIds){
+        const category = await this.categoryService.findOneById(categoryId);
+        categories.push(category);
+      }
+      return {
+        id,
+        title,
+        mainImage,
+        images,
+        price,
+        categories,
+        description
+      };
+    }
     throw new BadRequestException(`Not exist sweet with id: ${id}`);
   }
 
