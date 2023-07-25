@@ -6,7 +6,7 @@ import { Sweet } from "src/sweet/entities/sweet.entity";
 export class Novelty {
 
     @Prop({ type: SchemaTypes.ObjectId, ref: Sweet.name, unique: true })
-    public readonly sweet: string;
+    public readonly sweetId: string;
 
     @Prop({ type: SchemaTypes.Date, default: Date.now() })
     public readonly createdAt: string;

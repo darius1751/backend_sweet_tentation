@@ -33,15 +33,20 @@ export class PermissionService {
     if (!permission)
       throw new BadRequestException(`Not Exist permission with id: ${id}`);
   }
-  
+
   async existAllWithIds(permissions: string[]) {
-    for(let permission of permissions){
+    for (let permission of permissions) {
       await this.existWithId(permission);
     }
   }
 
   async findAll() {
-    return await this.permissionModel.find();
+    const permissions = await this.permissionModel.find();
+    const formattedPermissions = [];
+    for (const { id } of permissions) {
+      formattedPermissions.push(await this.findOneById(id));
+    }
+    return formattedPermissions;
   }
 
   async findOneById(id: string) {

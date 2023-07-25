@@ -7,10 +7,11 @@ async function main() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('v1/api');
   app.enableCors();
+  
   app.useGlobalPipes(new ValidationPipe({
-    always:true,
-    forbidNonWhitelisted:true,
-    whitelist:true
+    always: true,
+    forbidNonWhitelisted: true,
+    whitelist: true
   }))
   await app.listen(3000);
 }

@@ -14,12 +14,11 @@ export class NoveltyService {
     private sweetService: SweetService
   ) { }
 
-  async create(createNoveltyDto: CreateNoveltyDto) {
-    const { sweet } = createNoveltyDto;
+  async create({ sweet, ...createNoveltyDto }: CreateNoveltyDto) {
     await this.sweetService.findOneById(sweet);
     await this.notExistWithSweetId(sweet);
     try {
-      return await this.noveltyModel.create(createNoveltyDto);
+      return await this.noveltyModel.create({ ...createNoveltyDto, sweetId: sweet });
     } catch (exception) {
       throw new InternalServerErrorException(`Error in create novelty ${exception.message}`);
     }
@@ -32,20 +31,36 @@ export class NoveltyService {
   }
 
   async findAll(skip: number, take: number) {
-    return await this.noveltyModel.find({}, {}, { skip, limit: take });
+    const novelties = await this.noveltyModel.find({}, {}, { skip, limit: take });
+    const formattedNovelties = [];
+    for (const { id } of novelties) {
+      const novelty = await this.findOneById(id);
+      formattedNovelties.push(novelty);
+    }
+    return formattedNovelties;
   }
 
   async findOneById(id: string) {
     const novelty = await this.noveltyModel.findById(id);
-    if (novelty)
-      return novelty;
+    if (novelty) {
+      const { id, sweetId, active, createdAt, updatedAt, limitTime } = novelty;
+      const sweet = await this.sweetService.findOneById(sweetId);
+      return {
+        id,
+        sweet,
+        active,
+        limitTime,
+        createdAt,
+        updatedAt
+      };
+    }
     throw new BadRequestException(`Not exist novelty with id: ${id}`);
   }
 
   async update(id: string, updateNoveltyDto: UpdateNoveltyDto) {
     await this.findOneById(id);
     const { sweet } = updateNoveltyDto;
-    if(sweet)
+    if (sweet)
       await this.notExistWithSweetId(sweet);
     try {
       return this.noveltyModel.findByIdAndUpdate(id, { ...updateNoveltyDto, updatedAt: Date.now() });

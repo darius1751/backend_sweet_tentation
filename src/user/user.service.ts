@@ -19,29 +19,34 @@ export class UserService {
     private readonly authService: AuthService
   ) { }
 
-  async login(loginCredentialDto: LoginCredentialDto) {
-    const credentialId = await this.credentialService.login(loginCredentialDto);
-    const user = await this.userModel.findOne({ credentialId, active: true }, { credentialId: false });
-    if (user) {
-      const accessToken = await this.authService.createAccessToken({ user: loginCredentialDto.user, role: user.role })
-      return { user, access_token: accessToken };
-    }
-    throw new ForbiddenException(`User ${loginCredentialDto.user} not active or not exist`);
-  }
-
   async create(createUserDto: CreateUserDto) {
-    const { email, credential, phone, role } = createUserDto;
+    const { email, credential, phone, roleId } = createUserDto;
     await this.notExistEmail(email);
     await this.notExistPhone(phone);
-    await this.roleService.findOneById(role);
+    await this.roleService.findOneById(roleId);
+    const { id } = await this.credentialService.create(credential);
     try {
-      const { _id } = await this.credentialService.create(credential);
-      return await this.userModel.create({ ...createUserDto, credentialId: _id });
+      return await this.userModel.create({ ...createUserDto, credentialId: id }, { credentialId: false });
     } catch (exception) {
+      await this.credentialService.remove(id);
       throw new BadRequestException(`${exception.message}`);
     }
   }
 
+  async login(loginCredentialDto: LoginCredentialDto) {
+    const credentialId = await this.credentialService.login(loginCredentialDto);
+    const user = await this.userModel.findOne({ credentialId, active: true }, { credential: false });
+    if (user) {
+      const accessToken = await this.authService.createAccessToken({ user: loginCredentialDto.user, role: user.roleId })
+      const { id } = user;
+      return {
+        user: await this.findOneById(id),
+        access_token: accessToken
+      };
+    }
+    throw new ForbiddenException(`User ${loginCredentialDto.user} not active or not exist`);
+  }
+  
   private async notExistEmail(email: string) {
     const existEmail = await this.userModel.exists({ email });
     if (existEmail)
@@ -56,7 +61,7 @@ export class UserService {
 
   async findAll(skip: number, take: number) {
     try {
-      return this.userModel.find({}, { credentialId: false }, { limit: take, skip });
+      return this.userModel.find({}, { credential: false }, { limit: take, skip });
     } catch (exception) {
       throw new BadRequestException(`skip and take is a positive int`);
     }
@@ -64,8 +69,20 @@ export class UserService {
 
   async findOneById(id: string) {
     const user = await this.userModel.findById(id);
-    if (user)
-      return user;
+    if (user) {
+      const { roleId } = user;
+      const role = await this.roleService.findOneById(roleId);
+      const { id, name, phone, email, address, active } = user;
+      return {
+        id,
+        name,
+        phone,
+        email,
+        address,
+        role,
+        active
+      };
+    }
     throw new BadRequestException(`Not exist user with id: ${id}`);
   }
 

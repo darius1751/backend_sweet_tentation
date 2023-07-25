@@ -45,7 +45,7 @@ export class CredentialService {
     if (existUser)
       throw new BadRequestException(`Exist user: ${user}`);
   }
-  
+
   private async findOneById(id: string) {
     const credential = await this.credentialModel.findById(id);
     if (credential)
@@ -59,6 +59,15 @@ export class CredentialService {
       return await this.credentialModel.findByIdAndUpdate(id, updateCredentialDto);
     } catch (exception) {
       throw new InternalServerErrorException(`update credential error: ${exception.message}`);
+    }
+  }
+
+  async remove(id: string) {
+    await this.findOneById(id);
+    try {
+      return await this.credentialModel.findByIdAndDelete(id);
+    } catch (exception) {
+      throw new InternalServerErrorException(`Error in delete credential: ${exception.message}`);
     }
   }
 }

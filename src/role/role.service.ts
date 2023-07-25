@@ -33,20 +33,38 @@ export class RoleService {
   }
 
   async findAll() {
-    return await this.roleModel.find();
+    const roles = await this.roleModel.find();
+    const formattedRoles = [];
+    for (const { id } of roles) {
+      const role = await this.findOneById(id);
+      formattedRoles.push(role);
+    }
+    return formattedRoles;
   }
 
   async findOneById(id: string) {
     const role = await this.roleModel.findById(id);
-    if (role)
-      return role;
+    if (role) {
+      const { id, name, permissions: permissionsIds } = role;
+      const permissions = [];
+      for (const permissionId of permissionsIds) {
+        const permission = await this.permissionService.findOneById(permissionId);
+        permissions.push(permission);
+      }
+
+      return {
+        id,
+        name,
+        permissions
+      };
+    }
     throw new BadRequestException(`Not exist role with id: ${id}`);
   }
 
   async update(id: string, updateRoleDto: UpdateRoleDto) {
     await this.findOneById(id);
     const { permissions, name } = updateRoleDto;
-    if(name)
+    if (name)
       await this.notExistWithName(name);
     if (permissions)
       await this.permissionService.existAllWithIds(permissions);

@@ -18,9 +18,9 @@ export class User {
     public readonly address: string;
 
     @Prop({ required: true, type: SchemaTypes.ObjectId, ref: Role.name })
-    public readonly role: string;
+    public readonly roleId: string;
 
-    @Prop({ unique: true, required: true })
+    @Prop({ unique: true, required: true, type: SchemaTypes.ObjectId, ref: Role.name })
     public readonly credentialId: string;
 
     @Prop({ default: true })

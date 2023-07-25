@@ -73,7 +73,13 @@ export class OfferService {
 
   async findAll(skip: number, take: number) {
     try {
-      return await this.offerModel.find({}, {}, { skip, limit: take });
+      const offers = await this.offerModel.find({}, {}, { skip, limit: take });
+      const formattedOffers = [];
+      for (const { id } of offers){
+        const offer = await this.findOneById(id);
+        formattedOffers.push(offer);
+      }
+        return formattedOffers;
     } catch (exception) {
       throw new BadRequestException(`skip and take must be int positive`);
     }
@@ -81,15 +87,39 @@ export class OfferService {
 
   async findOneById(id: string) {
     const offer = await this.offerModel.findById(id);
-    if (offer)
-      return offer;
+    if (offer) {
+      const { normalPrice, newPrice, mainImage, images, title, active, discount, sweets: sweetsIds, categories: categoriesIds, description, limitTime, createdAt } = offer;
+      const sweets = [];
+      const categories = [];
+      for (const sweetId of sweetsIds) {
+        sweets.push(this.sweetService.findOneById(sweetId))
+      }
+      for (const categoryId of categoriesIds) {
+        categories.push(this.categoryService.findOneById(categoryId))
+      }
+      return {
+        id,
+        title,
+        limitTime,
+        mainImage,
+        images,
+        normalPrice,
+        newPrice,
+        discount,
+        active,
+        sweets,
+        categories,
+        description,
+        createdAt
+      };
+    }
     throw new BadRequestException(`Not exist offer with id: ${id}`);
   }
 
   async update(id: string, updateOfferDto: UpdateOfferDto) {
     await this.findOneById(id);
     const { sweets, categories, title } = updateOfferDto;
-    if(title)
+    if (title)
       await this.existWithTitle(title);
     if (sweets) {
       await this.sweetService.existAllWithIds(sweets);

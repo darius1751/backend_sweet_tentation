@@ -68,8 +68,23 @@ export class SweetService {
 
   async findOneById(id: string) {
     const sweet = await this.sweetModel.findById(id);
-    if (sweet)
-      return sweet;
+    if (sweet) {
+      const { title, price, mainImage, images, categories: categoriesIds, description } = sweet;
+      const categories = [];
+      for(const categoryId of categoriesIds){
+        const category = await this.categoryService.findOneById(categoryId);
+        categories.push(category);
+      }
+      return {
+        id,
+        title,
+        mainImage,
+        images,
+        price,
+        categories,
+        description
+      };
+    }
     throw new BadRequestException(`Not exist sweet with id: ${id}`);
   }
 
