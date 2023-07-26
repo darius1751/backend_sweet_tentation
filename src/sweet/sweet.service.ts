@@ -79,11 +79,17 @@ export class SweetService {
         const category = await this.categoryService.findOneById(categoryId);
         categories.push(category);
       }
+      const { id: mainImageId, createdAt, updatedAt, secureUrl } = mainImage;
       return {
         id,
         title,
-        mainImage,
-        images,
+        mainImage: {
+          id: mainImageId,
+          createdAt,
+          updatedAt,
+          secureUrl
+        },
+        images: images.map(({ id, createdAt, updatedAt, secureUrl }) => ({ id, createdAt, updatedAt, secureUrl })),
         price,
         categories,
         description

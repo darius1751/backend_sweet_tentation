@@ -5,6 +5,8 @@ import { Role } from './entities/role.entity';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { PermissionService } from 'src/permission/permission.service';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { FindPermissionDto } from 'src/permission/dto/find-permission.dto';
+import { FindRoleDto } from './dto/find-role.dto';
 
 @Injectable()
 export class RoleService {
@@ -42,11 +44,11 @@ export class RoleService {
     return formattedRoles;
   }
 
-  async findOneById(id: string) {
+  async findOneById(id: string): Promise<FindRoleDto> {
     const role = await this.roleModel.findById(id);
     if (role) {
-      const { id, name, permissions: permissionsIds } = role;
-      const permissions = [];
+      const { name, permissions: permissionsIds } = role;
+      const permissions: FindPermissionDto[] = [];
       for (const permissionId of permissionsIds) {
         const permission = await this.permissionService.findOneById(permissionId);
         permissions.push(permission);

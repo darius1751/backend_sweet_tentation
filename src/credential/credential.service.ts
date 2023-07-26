@@ -6,6 +6,7 @@ import { Credential } from './entities/credential.entity';
 import { CreateCredentialDto } from './dto/create-credential.dto';
 import { UpdateCredentialDto } from './dto/update-credential.dto';
 import { LoginCredentialDto } from './dto/login-credential.dto';
+import { FindCredentialDto } from './dto/find-credential.dto';
 
 @Injectable()
 export class CredentialService {
@@ -29,7 +30,7 @@ export class CredentialService {
     await this.existWithUser(user);
     const credential = await this.credentialModel.findOne({ user });
     if (compareSync(password, credential.password))
-      return credential._id;
+      return credential.id;
     throw new ForbiddenException(`Error in login`);
 
   }
@@ -46,10 +47,16 @@ export class CredentialService {
       throw new BadRequestException(`Exist user: ${user}`);
   }
 
-  private async findOneById(id: string) {
+  private async findOneById(id: string): Promise<FindCredentialDto> {
     const credential = await this.credentialModel.findById(id);
-    if (credential)
-      return credential;
+    if (credential) {
+      const { id, user, password } = credential;
+      return {
+        id,
+        user,
+        password
+      }
+    }
     throw new BadRequestException(`Not exist credential with id: ${id}`);
   }
 

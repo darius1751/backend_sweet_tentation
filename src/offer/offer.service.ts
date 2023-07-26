@@ -110,12 +110,18 @@ export class OfferService {
         const category = await this.categoryService.findOneById(categoryId);
         categories.push(category);
       }
+      const { id: mainImageId, secureUrl, createdAt: createdAtMainImage, updatedAt } = mainImage;
       return {
         id,
         title,
         limitTime,
-        mainImage,
-        images,
+        mainImage: {
+          id: mainImageId,
+          secureUrl,
+          createdAt: createdAtMainImage,
+          updatedAt
+        },
+        images: images.map(({ id, secureUrl, createdAt, updatedAt }) => ({ id, secureUrl, createdAt, updatedAt })),
         normalPrice,
         newPrice,
         discount,

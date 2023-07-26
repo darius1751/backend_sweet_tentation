@@ -8,6 +8,7 @@ import { CreateAdditionDto } from './dto/create-addition.dto';
 import { UpdateAdditionDto } from './dto/update-addition.dto';
 import { Addition } from './entities/addition.entity';
 import { unlink } from 'fs/promises';
+import { FindAdditionDto } from './dto/find-addition.dto';
 
 @Injectable()
 export class AdditionService {
@@ -44,14 +45,33 @@ export class AdditionService {
   }
 
   async findAll(skip: number, take: number) {
-    return await this.additionModel.find({}, {}, { skip, limit: take });
+    const additions = await this.additionModel.find({}, {}, { skip, limit: take });
+    const findAdditionsDto: FindAdditionDto[] = [];
+    for (const { id } of additions) {
+      const addition = await this.findOneById(id);
+      findAdditionsDto.push(addition);
+    }
+    return findAdditionsDto;
   }
 
-  async findOneById(id: string) {
+  async findOneById(id: string): Promise<FindAdditionDto> {
     const addition = await this.additionModel.findById(id);
-      if (addition)
-        return addition;
-      throw new BadRequestException(`Not exist addition with id: ${id}`);   
+    if (addition) {
+      const { id, name, price, image } = addition;
+      const { id: imageId, secureUrl, createdAt, updatedAt } = image;
+      return {
+        id,
+        name,
+        price,
+        image: {
+          id: imageId,
+          secureUrl,
+          createdAt,
+          updatedAt
+        }
+      }
+    }
+    throw new BadRequestException(`Not exist addition with id: ${id}`);
   }
 
   async update(id: string, updateAdditionDto: UpdateAdditionDto) {
