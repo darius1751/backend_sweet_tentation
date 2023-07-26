@@ -23,8 +23,8 @@ export class AuthService {
     async verifyAccessToken(accessToken: string) {
         const { role }: SignInJwt = this.jwtService.decode(accessToken, { json: true }) as SignInJwt;
         if (!isMongoId(role))
-            throw new UnauthorizedException(`Error in verifyAccessToken`);
+            throw new UnauthorizedException(`Not is a accessToken valid`);
         await this.roleService.findOneById(role);
-        return await this.jwtService.verifyAsync(accessToken);
+        return await this.jwtService.verifyAsync<SignInJwt>(accessToken);
     }
 }

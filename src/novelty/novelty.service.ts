@@ -5,6 +5,7 @@ import { CreateNoveltyDto } from './dto/create-novelty.dto';
 import { UpdateNoveltyDto } from './dto/update-novelty.dto';
 import { SweetService } from 'src/sweet/sweet.service';
 import { Novelty } from './entities/novelty.entity';
+import { FindNoveltyDto } from './dto/find-novelty.dto';
 
 @Injectable()
 export class NoveltyService {
@@ -32,15 +33,15 @@ export class NoveltyService {
 
   async findAll(skip: number, take: number) {
     const novelties = await this.noveltyModel.find({}, {}, { skip, limit: take });
-    const formattedNovelties = [];
+    const findNoveltiesDto: FindNoveltyDto[] = [];
     for (const { id } of novelties) {
       const novelty = await this.findOneById(id);
-      formattedNovelties.push(novelty);
+      findNoveltiesDto.push(novelty);
     }
-    return formattedNovelties;
+    return findNoveltiesDto;
   }
 
-  async findOneById(id: string) {
+  async findOneById(id: string): Promise<FindNoveltyDto>{
     const novelty = await this.noveltyModel.findById(id);
     if (novelty) {
       const { id, sweetId, active, createdAt, updatedAt, limitTime } = novelty;

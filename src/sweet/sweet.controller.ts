@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors, UploadedFiles, UseFilters, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors, UploadedFiles, UseFilters, Query, UseGuards } from '@nestjs/common';
 import { SweetService } from './sweet.service';
 import { UpdateSweetDto } from './dto/update-sweet.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -9,7 +9,9 @@ import { CreateWithFileErrorFilter } from 'src/common/filters/create-with-file-e
 import { MongoIdPipe } from 'src/common/pipes/mongo-id/mongo-id.pipe';
 import { RequirePermission } from 'src/common/decorators/requirePermission.decorator';
 import { Permission } from 'src/common/permission.enum';
+import { PermissionGuard } from 'src/common/guards/permission/permission.guard';
 
+@UseGuards(PermissionGuard)
 @Controller('sweet')
 export class SweetController {
 
@@ -56,7 +58,7 @@ export class SweetController {
   update(@Param('id', MongoIdPipe) id: string, @Body() updateSweetDto: UpdateSweetDto) {
     return this.sweetService.update(id, updateSweetDto);
   }
-  
+
   @RequirePermission(Permission.DELETE_SWEET)
   @Delete(':id')
   remove(@Param('id', MongoIdPipe) id: string) {

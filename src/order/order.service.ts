@@ -9,10 +9,14 @@ import { OfferService } from 'src/offer/offer.service';
 import { CreateSweetOrderDto } from './dto/create-sweet-order.dto';
 import { AdditionService } from 'src/addition/addition.service';
 import { AdditionOrderType } from './entities/addition-order.entity';
-import { SweetOrderType } from './entities/sweet-order.entity';
+import { SweetOrder, SweetOrderType } from './entities/sweet-order.entity';
 import { CreateOfferOrderDto } from './dto/create-offer-order.dto';
-import { OfferOrderType } from './entities/offer-order.entity';
+import { OfferOrder, OfferOrderType } from './entities/offer-order.entity';
 import { isMongoId } from 'class-validator';
+import { FindOrderDto } from './dto/find-order.dto';
+import { FindSweetOrderDto } from './dto/find-sweet-order.dto';
+import { FindOfferOrderDto } from './dto/find-offer-order.dto';
+import { FindAdditionOrderDto } from './dto/find-addition-order.dto';
 
 @Injectable()
 export class OrderService {
@@ -100,14 +104,56 @@ export class OrderService {
   }
 
   async findAll(skip: number, take: number) {
-    return await this.orderModel.find({}, {}, { skip, limit: take });
+    const orders = await this.orderModel.find({}, {}, { skip, limit: take });
+    const findOrdersDto: FindOrderDto[] = [];
+    for (const { id } of orders) {
+      const order = await this.findOneById(id);
+      findOrdersDto.push(order);
+    }
+    return findOrdersDto;
   }
 
-  async findOneById(id: string) {
+  async findOneById(id: string): Promise<FindOrderDto> {
     const order = await this.orderModel.findById(id);
-    if (order)
-      return order;
+    if (order) {
+      const { totalToPay, sweets, offers } = order;
+
+      const findSweetsOrderDto = await this.applyFormattedSweets(sweets);
+      const findOffersOrderDto = await this.applyFormattedOffers(offers);
+      return {
+        id,
+        sweets: findSweetsOrderDto,
+        offers: findOffersOrderDto,
+        totalToPay
+      }
+    }
     throw new BadRequestException(`Not exist order with id: ${id}`);
+  }
+
+  private async applyFormattedSweets(sweetsOrder: SweetOrder[]) {
+    const findSweetsOrderDto: FindSweetOrderDto[] = [];
+    for (const { id, title, sweet, price, cant, additions, totalToPay, observations } of sweetsOrder) {
+      const findAdditionsOrderDto: FindAdditionOrderDto[] = [];
+      for (const additionOrder of additions) {
+        const { id, addition, name, price, cant, totalToPay } = additionOrder;
+        findAdditionsOrderDto.push({ id, addition, name, price, cant, totalToPay });
+      }
+      findSweetsOrderDto.push({ id, sweet, title, price, cant, additions: findAdditionsOrderDto, totalToPay, observations })
+    }
+    return findSweetsOrderDto;
+  }
+
+  private async applyFormattedOffers(offers: OfferOrder[]) {
+    const findOffersOrderDto: FindOfferOrderDto[] = [];
+    for (const { id, offer, title, price, cant, additions, observations, totalToPay } of offers) {
+      const findAdditionsOrderDto: FindAdditionOrderDto[] = [];
+      for (const additionOrder of additions) {
+        const { id, addition, name, price, cant, totalToPay } = additionOrder;
+        findAdditionsOrderDto.push({ id, addition, name, price, cant, totalToPay });
+      }
+      findOffersOrderDto.push({ id, offer, title, price, cant, additions: findAdditionsOrderDto, totalToPay, observations })
+    }
+    return findOffersOrderDto;
   }
 
   async update(id: string, updateOrderDto: UpdateOrderDto) {

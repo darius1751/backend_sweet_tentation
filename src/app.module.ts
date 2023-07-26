@@ -19,6 +19,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtMiddleware } from './common/jwt/jwt.middleware';
 import { PermissionModule } from './permission/permission.module';
+import { SweetController } from './sweet/sweet.controller';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -27,7 +28,7 @@ import { PermissionModule } from './permission/permission.module';
     JwtModule.register({
       global: true,
       secret: env.JWT_SECRET_KEY,
-      signOptions: { algorithm: 'HS256', expiresIn: '5h', mutatePayload: false }      
+      signOptions: { algorithm: 'HS256', expiresIn: '5h', mutatePayload: false }
     }),
     MongooseModule.forRoot(`mongodb://${process.env.MONGO_USERNAME}:${env.MONGO_PASSWORD}@db:27017/`, {
       dbName: env.MONGO_DATABASE,
@@ -61,7 +62,7 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(JwtMiddleware)
-      .forRoutes(AppController)
+      .forRoutes(AppController, SweetController)
   }
 
 }

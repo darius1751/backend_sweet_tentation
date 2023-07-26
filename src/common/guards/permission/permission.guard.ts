@@ -1,22 +1,30 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
+import { Request } from 'express';
+import { AuthService } from 'src/auth/auth.service';
 import { Permission } from 'src/common/permission.enum';
+import { RoleService } from 'src/role/role.service';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
 
   constructor(
-    private readonly reflector: Reflector
+    private readonly reflector: Reflector,
+    private readonly roleService: RoleService,
+    private readonly authService: AuthService
   ) { }
 
-  canActivate(
+  async canActivate(
     context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  ): Promise<boolean> {
+    const request = context.switchToHttp().getRequest() as Request;
+    const { access_token } = request.headers;
     const requirePermission = this.reflector.get<Permission>('requirePermission', context.getHandler());
-    if(!requirePermission)
+    if (!requirePermission)
       return true;
-    //Validate permission in role
-    return true;
+    const { role } = await this.authService.verifyAccessToken(access_token as string);
+    const { permissions } = await this.roleService.findOneById(role);
+    const hasPermission = permissions.includes(requirePermission);
+    return hasPermission;
   }
 }

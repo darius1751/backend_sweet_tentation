@@ -11,6 +11,7 @@ import { Permission } from 'src/common/permission.enum';
 
 @Controller('addition')
 export class AdditionController {
+  
   constructor(private readonly additionService: AdditionService) { }
 
   @RequirePermission(Permission.CREATE_ADDITION)
