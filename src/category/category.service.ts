@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
+import { FindCategoryDto } from './dto/find-category-dto';
 
 @Injectable()
 export class CategoryService {
@@ -13,12 +14,12 @@ export class CategoryService {
   async create(createCategoryDto: CreateCategoryDto) {
     const { name } = createCategoryDto;
     await this.notExistWithName(name);
-    try{
+    try {
       return this.categoryModel.create(createCategoryDto);
-    }catch(exception){
+    } catch (exception) {
       throw new InternalServerErrorException(`Error in create category: ${exception.message}`);
     }
-    
+
   }
 
   private async notExistWithName(name: string) {
@@ -28,13 +29,18 @@ export class CategoryService {
   }
 
   async findAll() {
-    return await this.categoryModel.find();
+    return await this.categoryModel.find<FindCategoryDto[]>();
   }
 
-  async findOneById(id: string) {
-    const category = await this.categoryModel.findById(id);
-    if (category)
-      return category;
+  async findOneById(id: string): Promise<FindCategoryDto> {
+    const category = await this.categoryModel.findById<FindCategoryDto>(id);
+    if (category) {
+      const { name } = category;
+      return {
+        id,
+        name
+      };
+    }
     throw new BadRequestException(`Not exist category with id: ${id}`);
   }
   async existAllWithIds(categories: string[]) {

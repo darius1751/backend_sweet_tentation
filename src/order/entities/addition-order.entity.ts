@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { SchemaTypes } from "mongoose";
+import { Document, SchemaTypes } from "mongoose";
 import { Addition } from "src/addition/entities/addition.entity";
 
 @Schema({ versionKey: false })
-export class AdditionOrder {
+export class AdditionOrder extends Document {
 
     @Prop({ type: SchemaTypes.ObjectId, ref: Addition.name, required: true })
     public readonly addition: string;

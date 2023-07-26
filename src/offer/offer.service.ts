@@ -10,6 +10,9 @@ import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
 import { CreateOfferImagesDto } from './dto/create-offer-images.dto';
 import { SweetService } from 'src/sweet/sweet.service';
+import { FindSweetDto } from 'src/sweet/dto/find-sweet-dto';
+import { FindCategoryDto } from 'src/category/dto/find-category-dto';
+import { FindOfferDto } from './dto/find-offer.dto';
 
 @Injectable()
 export class OfferService {
@@ -74,28 +77,38 @@ export class OfferService {
   async findAll(skip: number, take: number) {
     try {
       const offers = await this.offerModel.find({}, {}, { skip, limit: take });
-      const formattedOffers = [];
-      for (const { id } of offers){
+      const findOffersDto: FindOfferDto[] = [];
+      for (const { id } of offers) {
         const offer = await this.findOneById(id);
-        formattedOffers.push(offer);
+        findOffersDto.push(offer);
       }
-        return formattedOffers;
+      return findOffersDto;
     } catch (exception) {
       throw new BadRequestException(`skip and take must be int positive`);
     }
   }
 
-  async findOneById(id: string) {
+  async findOneById(id: string): Promise<FindOfferDto> {
     const offer = await this.offerModel.findById(id);
     if (offer) {
-      const { normalPrice, newPrice, mainImage, images, title, active, discount, sweets: sweetsIds, categories: categoriesIds, description, limitTime, createdAt } = offer;
-      const sweets = [];
-      const categories = [];
+      const {
+        normalPrice, newPrice,
+        mainImage, images,
+        title, active,
+        discount, sweets: sweetsIds,
+        categories: categoriesIds,
+        description, limitTime,
+        createdAt
+      } = offer;
+      const sweets: FindSweetDto[] = [];
+      const categories: FindCategoryDto[] = [];
       for (const sweetId of sweetsIds) {
-        sweets.push(this.sweetService.findOneById(sweetId))
+        const sweet = await this.sweetService.findOneById(sweetId);
+        sweets.push(sweet);
       }
       for (const categoryId of categoriesIds) {
-        categories.push(this.categoryService.findOneById(categoryId))
+        const category = await this.categoryService.findOneById(categoryId);
+        categories.push(category);
       }
       return {
         id,

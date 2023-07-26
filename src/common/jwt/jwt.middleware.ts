@@ -13,10 +13,14 @@ export class JwtMiddleware implements NestMiddleware {
     const { access_token } = req.headers;
     if (!access_token)
       throw new BadRequestException(`This service require authorization`);
-    const verifyAccessToken = await this.authService.verifyAccessToken(access_token as string);
-    if (verifyAccessToken)
-      next();
-    else
-      throw new UnauthorizedException(`AccessToken not is valid`);
+    try {
+      const verifyAccessToken = await this.authService.verifyAccessToken(access_token as string);
+      if (verifyAccessToken)
+        next();
+      else
+        throw new UnauthorizedException(`AccessToken not is valid`);
+    } catch (exception) {
+      throw new BadRequestException(`AccessToken no use valid format`);
+    }
   }
 }

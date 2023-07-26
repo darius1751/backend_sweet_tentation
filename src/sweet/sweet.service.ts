@@ -10,6 +10,8 @@ import { CategoryService } from 'src/category/category.service';
 import { removeImage } from 'src/common/utils/removeImage';
 import { removeLocalImages } from 'src/common/utils/removeLocateImages';
 import { saveImages } from 'src/common/utils/saveImages';
+import { FindCategoryDto } from 'src/category/dto/find-category-dto';
+import { FindSweetDto } from './dto/find-sweet-dto';
 
 @Injectable()
 export class SweetService {
@@ -59,19 +61,21 @@ export class SweetService {
 
   async findAll(skip: number, take: number) {
 
-    try {
-      return await this.sweetModel.find({}, { images: false }, { skip, limit: take });
-    } catch (exception) {
-      throw new BadRequestException(`skip and take must be int positive`);
+    const sweets = await this.sweetModel.find({}, {}, { skip, limit: take });
+    const findSweetsDto: FindSweetDto[] = [];
+    for (const { id } of sweets) {
+      const sweet = await this.findOneById(id);
+      findSweetsDto.push(sweet);
     }
+    return findSweetsDto;
   }
 
-  async findOneById(id: string) {
+  async findOneById(id: string): Promise<FindSweetDto> {
     const sweet = await this.sweetModel.findById(id);
     if (sweet) {
       const { title, price, mainImage, images, categories: categoriesIds, description } = sweet;
-      const categories = [];
-      for(const categoryId of categoriesIds){
+      const categories: FindCategoryDto[] = [];
+      for (const categoryId of categoriesIds) {
         const category = await this.categoryService.findOneById(categoryId);
         categories.push(category);
       }
