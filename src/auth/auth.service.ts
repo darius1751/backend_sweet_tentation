@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { isMongoId } from 'class-validator';
 import { RoleService } from 'src/role/role.service';
@@ -21,6 +21,8 @@ export class AuthService {
     }
 
     async verifyAccessToken(accessToken: string) {
+        if(!accessToken)
+            throw new BadRequestException(`Need authorization`);
         const { role }: SignInJwt = this.jwtService.decode(accessToken, { json: true }) as SignInJwt;
         if (!isMongoId(role))
             throw new UnauthorizedException(`Not is a accessToken valid`);

@@ -7,5 +7,5 @@ export class CreatePermissionDto {
 
     @IsString()
     @IsOptional()
-    public readonly description: string;
+    public readonly description?: string;
 }

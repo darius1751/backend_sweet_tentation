@@ -18,6 +18,14 @@ export class RoleController {
     return this.roleService.create(createRoleDto);
   }
   
+  @RequirePermission(Permission.CREATE_MANY_ROLES)
+  @Post('many')
+  createMany(
+    @Body() createRolesDto: CreateRoleDto[]
+  ) {
+    return this.roleService.createMany(createRolesDto);
+  }
+
   @RequirePermission(Permission.FIND_ALL_ROLES)
   @Get()
   findAll() {

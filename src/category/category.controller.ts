@@ -12,18 +12,25 @@ export class CategoryController {
 
   constructor(private readonly categoryService: CategoryService) { }
 
-  
+
   @RequirePermission(PermissionEnum.CREATE_CATEGORY)
   @Post()
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
   }
 
+  @RequirePermission(PermissionEnum.CREATE_MANY_CATEGORIES)
+  @Post('many')
+  createMany(
+    @Body() CreateCategoriesDto: CreateCategoryDto[]
+  ) {
+    return this.categoryService.createMany(CreateCategoriesDto);
+  }
   @Get()
   findAll() {
     return this.categoryService.findAll();
   }
-  
+
   @Get(':id')
   findOneById(@Param('id', MongoIdPipe) id: string) {
     return this.categoryService.findOneById(id);
@@ -39,5 +46,5 @@ export class CategoryController {
   @Delete(':id')
   remove(@Param('id', MongoIdPipe) id: string) {
     return this.categoryService.remove(id);
-  }  
+  }
 }

@@ -20,6 +20,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtMiddleware } from './common/jwt/jwt.middleware';
 import { PermissionModule } from './permission/permission.module';
 import { SweetController } from './sweet/sweet.controller';
+import { SeedModule } from './seed/seed.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -45,7 +46,8 @@ import { SweetController } from './sweet/sweet.controller';
     OrderModule,
     CommonModule,
     AuthModule,
-    PermissionModule
+    PermissionModule,
+    SeedModule
   ],
   controllers: [AppController],
   providers: [AppService],
