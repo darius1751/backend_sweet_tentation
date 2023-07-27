@@ -1,12 +1,12 @@
 import { FindCategoryDto } from "src/category/dto/find-category-dto"
+import { FindImageDto } from "src/sweet/dto/find-image.dto";
 import { FindSweetDto } from "src/sweet/dto/find-sweet-dto"
-import { Image } from "src/sweet/entities/image.entity"
 
 export class FindOfferDto {
     id: string;
     title: string;    
-    mainImage: Image;
-    images: Image[];
+    mainImage: FindImageDto;
+    images: FindImageDto[];
     normalPrice: number;
     newPrice: number;
     discount: number;

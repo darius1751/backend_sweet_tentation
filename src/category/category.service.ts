@@ -28,12 +28,27 @@ export class CategoryService {
       throw new BadRequestException(`Exist category with name: ${name}`);
   }
 
+  async formatted(categoriesIds: string[]) {
+    const categories: FindCategoryDto[] = [];
+    for (const categoryId of categoriesIds) {
+      const category = await this.findOneById(categoryId);
+      categories.push(category);
+    }
+    return categories;
+  }
+
   async findAll() {
-    return await this.categoryModel.find<FindCategoryDto[]>();
+    const categories = await this.categoryModel.find();
+    const findCategoriesDto: FindCategoryDto[] = [];
+    for (const { id, name } of categories) {
+      findCategoriesDto.push({ id, name });
+    }
+    return findCategoriesDto;
+
   }
 
   async findOneById(id: string): Promise<FindCategoryDto> {
-    const category = await this.categoryModel.findById<FindCategoryDto>(id);
+    const category = await this.categoryModel.findById(id);
     if (category) {
       const { name } = category;
       return {

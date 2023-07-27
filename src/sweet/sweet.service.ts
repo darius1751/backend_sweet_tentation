@@ -12,6 +12,7 @@ import { removeLocalImages } from 'src/common/utils/removeLocateImages';
 import { saveImages } from 'src/common/utils/saveImages';
 import { FindCategoryDto } from 'src/category/dto/find-category-dto';
 import { FindSweetDto } from './dto/find-sweet-dto';
+import { Image } from './entities/image.entity';
 
 @Injectable()
 export class SweetService {
@@ -60,30 +61,57 @@ export class SweetService {
   }
 
   async findAll(skip: number, take: number) {
-
     const sweets = await this.sweetModel.find({}, {}, { skip, limit: take });
     const findSweetsDto: FindSweetDto[] = [];
-    for (const { id } of sweets) {
-      const sweet = await this.findOneById(id);
-      findSweetsDto.push(sweet);
+    for (const { id, title, price, mainImage, images, categories: categoriesIds, description } of sweets) {
+      const categories: FindCategoryDto[] = await this.categoryService.formatted(categoriesIds);
+      const { id: mainImageId, createdAt, updatedAt, secureUrl } = mainImage;
+      findSweetsDto.push({
+        id,
+        title,
+        mainImage: {
+          id: mainImageId,
+          createdAt,
+          updatedAt,
+          secureUrl
+        },
+        images: await this.formattedImages(images),
+        price,
+        categories,
+        description
+      });
     }
     return findSweetsDto;
+  }
+  public async formattedImages(images: Image[]) {
+    return images.map(({ id, createdAt, updatedAt, secureUrl }) => ({ id, createdAt, updatedAt, secureUrl }));
+  }
+
+  public async formatted(sweetsIds: string[]){
+    const sweets: FindSweetDto[] = [];
+    for (const sweetId of sweetsIds) {
+      const sweet = await this.findOneById(sweetId);
+      sweets.push(sweet);
+    }
+    return sweets;
   }
 
   async findOneById(id: string): Promise<FindSweetDto> {
     const sweet = await this.sweetModel.findById(id);
     if (sweet) {
       const { title, price, mainImage, images, categories: categoriesIds, description } = sweet;
-      const categories: FindCategoryDto[] = [];
-      for (const categoryId of categoriesIds) {
-        const category = await this.categoryService.findOneById(categoryId);
-        categories.push(category);
-      }
+      const categories: FindCategoryDto[] = await this.categoryService.formatted(categoriesIds);
+      const { id: mainImageId, createdAt, updatedAt, secureUrl } = mainImage;
       return {
         id,
         title,
-        mainImage,
-        images,
+        mainImage: {
+          id: mainImageId,
+          createdAt,
+          updatedAt,
+          secureUrl
+        },
+        images: await this.formattedImages(images),
         price,
         categories,
         description

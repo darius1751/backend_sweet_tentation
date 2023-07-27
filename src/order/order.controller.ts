@@ -16,7 +16,7 @@ export class OrderController {
   create(@Body() createOrderDto: CreateOrderDto) {
     return this.orderService.create(createOrderDto);
   }
-  
+
   @RequirePermission(Permission.FIND_ALL_ORDERS)
   @Get()
   findAll(
@@ -25,7 +25,7 @@ export class OrderController {
   ) {
     return this.orderService.findAll(skip, take);
   }
-  
+
   @RequirePermission(Permission.FIND_ONE_ORDER_BY_ID)
   @Get(':id')
   findOneById(@Param('id', MongoIdPipe) id: string) {

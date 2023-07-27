@@ -78,9 +78,36 @@ export class OfferService {
     try {
       const offers = await this.offerModel.find({}, {}, { skip, limit: take });
       const findOffersDto: FindOfferDto[] = [];
-      for (const { id } of offers) {
-        const offer = await this.findOneById(id);
-        findOffersDto.push(offer);
+      for (const { id, normalPrice, newPrice,
+        mainImage, images,
+        title, active,
+        discount, sweets: sweetsIds,
+        categories: categoriesIds,
+        description, limitTime,
+        createdAt } of offers) {
+        const sweets: FindSweetDto[] = await this.sweetService.formatted(sweetsIds);
+        const categories: FindCategoryDto[] = await this.categoryService.formatted(categoriesIds);
+        const { id: mainImageId, secureUrl, createdAt: createdAtMainImage, updatedAt } = mainImage;
+        findOffersDto.push({
+          id,
+          title,
+          limitTime,
+          mainImage: {
+            id: mainImageId,
+            secureUrl,
+            createdAt: createdAtMainImage,
+            updatedAt
+          },
+          images: await this.sweetService.formattedImages(images),
+          normalPrice,
+          newPrice,
+          discount,
+          active,
+          sweets,
+          categories,
+          description,
+          createdAt
+        });
       }
       return findOffersDto;
     } catch (exception) {
@@ -95,27 +122,26 @@ export class OfferService {
         normalPrice, newPrice,
         mainImage, images,
         title, active,
-        discount, sweets: sweetsIds,
+        discount,
+        sweets: sweetsIds,
         categories: categoriesIds,
         description, limitTime,
         createdAt
       } = offer;
-      const sweets: FindSweetDto[] = [];
-      const categories: FindCategoryDto[] = [];
-      for (const sweetId of sweetsIds) {
-        const sweet = await this.sweetService.findOneById(sweetId);
-        sweets.push(sweet);
-      }
-      for (const categoryId of categoriesIds) {
-        const category = await this.categoryService.findOneById(categoryId);
-        categories.push(category);
-      }
+      const sweets: FindSweetDto[] = await this.sweetService.formatted(sweetsIds);
+      const categories: FindCategoryDto[] = await this.categoryService.formatted(categoriesIds);
+      const { id: mainImageId, secureUrl, createdAt: createdAtMainImage, updatedAt } = mainImage;
       return {
         id,
         title,
         limitTime,
-        mainImage,
-        images,
+        mainImage: {
+          id: mainImageId,
+          secureUrl,
+          createdAt: createdAtMainImage,
+          updatedAt
+        },
+        images: await this.sweetService.formattedImages(images),
         normalPrice,
         newPrice,
         discount,

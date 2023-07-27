@@ -24,7 +24,7 @@ export class PermissionGuard implements CanActivate {
       return true;
     const { role } = await this.authService.verifyAccessToken(access_token as string);
     const { permissions } = await this.roleService.findOneById(role);
-    const hasPermission = permissions.includes(requirePermission);
+    const hasPermission = permissions.filter(({ name }) => name === requirePermission).length != 0;
     return hasPermission;
   }
 }

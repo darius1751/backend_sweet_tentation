@@ -34,14 +34,14 @@ export class NoveltyService {
   async findAll(skip: number, take: number) {
     const novelties = await this.noveltyModel.find({}, {}, { skip, limit: take });
     const findNoveltiesDto: FindNoveltyDto[] = [];
-    for (const { id } of novelties) {
-      const novelty = await this.findOneById(id);
-      findNoveltiesDto.push(novelty);
+    for (const { id, sweetId, active, limitTime, createdAt, updatedAt } of novelties) {
+      const sweet = await this.sweetService.findOneById(sweetId);
+      findNoveltiesDto.push({ id, sweet, active, limitTime, createdAt, updatedAt });
     }
     return findNoveltiesDto;
   }
 
-  async findOneById(id: string): Promise<FindNoveltyDto>{
+  async findOneById(id: string): Promise<FindNoveltyDto> {
     const novelty = await this.noveltyModel.findById(id);
     if (novelty) {
       const { id, sweetId, active, createdAt, updatedAt, limitTime } = novelty;

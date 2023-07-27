@@ -1,6 +1,6 @@
 import { Transform } from "class-transformer";
 import { IsNumberString, IsOptional, IsString } from "class-validator";
-import { transformMongoIdArray } from "src/common/utils/transformMongoIdArray";
+import { transformMongoIdArray } from "src/common/pipes/transformMongoIdArray";
 
 export class CreateSweetDto {
 

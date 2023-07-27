@@ -4,6 +4,7 @@ import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Permission } from './entities/permission.entity';
 import { Model } from 'mongoose';
+import { FindPermissionDto } from './dto/find-permission.dto';
 
 @Injectable()
 export class PermissionService {
@@ -40,19 +41,33 @@ export class PermissionService {
     }
   }
 
+  async formatted(permissionsIds: string[]) {
+    const permissions: FindPermissionDto[] = [];
+    for (const permissionId of permissionsIds) {
+      const permission = await this.findOneById(permissionId);
+      permissions.push(permission);
+    }
+    return permissions;
+  }
   async findAll() {
     const permissions = await this.permissionModel.find();
-    const formattedPermissions = [];
-    for (const { id } of permissions) {
-      formattedPermissions.push(await this.findOneById(id));
+    const findPermissionsDto: FindPermissionDto[] = [];
+    for (const { id, name, description } of permissions) {
+      findPermissionsDto.push({ id, name, description });
     }
-    return formattedPermissions;
+    return findPermissionsDto;
   }
 
-  async findOneById(id: string) {
+  async findOneById(id: string): Promise<FindPermissionDto> {
     const permission = await this.permissionModel.findById(id);
-    if (permission)
-      return permission;
+    if (permission) {
+      const { id, name, description } = permission;
+      return {
+        id,
+        name,
+        description
+      };
+    }
     throw new BadRequestException(`Not exist permission with id: ${id}`);
   }
 
