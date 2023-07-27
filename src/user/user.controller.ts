@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -6,7 +6,9 @@ import { LoginCredentialDto } from 'src/credential/dto/login-credential.dto';
 import { MongoIdPipe } from 'src/common/pipes/mongo-id/mongo-id.pipe';
 import { RequirePermission } from 'src/common/decorators/requirePermission.decorator';
 import { Permission } from 'src/common/permission.enum';
+import { PermissionGuard } from 'src/common/guards/permission/permission.guard';
 
+@UseGuards(PermissionGuard)
 @Controller('user')
 export class UserController {
 
