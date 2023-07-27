@@ -9,6 +9,7 @@ import { UpdateAdditionDto } from './dto/update-addition.dto';
 import { Addition } from './entities/addition.entity';
 import { unlink } from 'fs/promises';
 import { FindAdditionDto } from './dto/find-addition.dto';
+import { getPagination } from 'src/common/utils/getPagination';
 
 @Injectable()
 export class AdditionService {
@@ -46,10 +47,17 @@ export class AdditionService {
 
   async findAll(skip: number, take: number) {
     const additions = await this.additionModel.find({}, {}, { skip, limit: take });
+    const findAdditionsDto: FindAdditionDto[] = await this.formatted(additions);
+    const totalRegisters = await this.additionModel.count();
+    const pagination = getPagination({ skip, take, totalResults: findAdditionsDto.length, totalRegisters })
+    return { additions: findAdditionsDto, pagination };
+
+  }
+  async formatted(additions: any[]) {
     const findAdditionsDto: FindAdditionDto[] = [];
     for (const { id, name, price, image } of additions) {
       const { id: imageId, secureUrl, createdAt, updatedAt } = image;
-      findAdditionsDto.push({ id, name, price, image: { id: imageId, secureUrl, createdAt, updatedAt}});
+      findAdditionsDto.push({ id, name, price, image: { id: imageId, secureUrl, createdAt, updatedAt } });
     }
     return findAdditionsDto;
   }

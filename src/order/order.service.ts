@@ -17,6 +17,7 @@ import { CreateAdditionOrderDto } from './dto/create-addition-order.dto';
 import { SweetService } from 'src/sweet/sweet.service';
 import { OfferService } from 'src/offer/offer.service';
 import { AdditionService } from 'src/addition/addition.service';
+import { getPagination } from 'src/common/utils/getPagination';
 
 @Injectable()
 export class OrderService {
@@ -123,7 +124,9 @@ export class OrderService {
         totalToPay
       }
     }
-    return findOrdersDto;
+    const totalRegisters = await this.orderModel.count();
+    const pagination = getPagination({ skip, take, totalResults: findOrdersDto.length, totalRegisters });
+    return { orders: findOrdersDto, pagination };
   }
 
   async findOneById(id: string): Promise<FindOrderDto> {

@@ -13,6 +13,7 @@ import { SweetService } from 'src/sweet/sweet.service';
 import { FindSweetDto } from 'src/sweet/dto/find-sweet-dto';
 import { FindCategoryDto } from 'src/category/dto/find-category-dto';
 import { FindOfferDto } from './dto/find-offer.dto';
+import { getPagination } from 'src/common/utils/getPagination';
 
 @Injectable()
 export class OfferService {
@@ -109,7 +110,9 @@ export class OfferService {
           createdAt
         });
       }
-      return findOffersDto;
+      const totalRegisters = await this.offerModel.count();
+      const pagination = getPagination({ skip, take, totalResults: findOffersDto.length, totalRegisters })
+      return { offers: findOffersDto, pagination };
     } catch (exception) {
       throw new BadRequestException(`skip and take must be int positive`);
     }
