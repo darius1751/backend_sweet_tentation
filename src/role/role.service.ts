@@ -28,6 +28,18 @@ export class RoleService {
     }
   }
 
+  async createMany(createRolesDto: CreateRoleDto[]) {
+    for (const { permissions, name } of createRolesDto) {
+      await this.notExistWithName(name);
+      await this.permissionService.existAllWithIds(permissions);
+    }
+    try {
+      return await this.roleModel.insertMany(createRolesDto);
+    } catch (exception) {
+      throw new InternalServerErrorException(`Error in create role: ${exception.message}`);
+    }
+  }
+
   private async notExistWithName(name: string) {
     const role = await this.roleModel.exists({ name });
     if (role)
@@ -36,7 +48,7 @@ export class RoleService {
 
   async findAll() {
     const roles = await this.roleModel.find();
-    const findRolesDto:FindRoleDto[] = [];
+    const findRolesDto: FindRoleDto[] = [];
     for (const { id, name, permissions: permissionsIds } of roles) {
       const permissions: FindPermissionDto[] = await this.permissionService.formatted(permissionsIds);
       findRolesDto.push({ id, name, permissions });

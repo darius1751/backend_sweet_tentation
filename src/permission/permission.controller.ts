@@ -19,6 +19,12 @@ export class PermissionController {
     return this.permissionService.create(createPermissionDto);
   }
 
+  @RequirePermission(Permission.CREATE_MANY_PERMISSIONS)
+  @Post('many')
+  createMany(@Body() createPermissionDto: CreatePermissionDto[]) {
+    return this.permissionService.createMany(createPermissionDto);
+  }
+
   @RequirePermission(Permission.FIND_ALL_PERMISSIONS)
   @Get()
   findAll() {

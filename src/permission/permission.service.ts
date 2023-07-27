@@ -23,6 +23,17 @@ export class PermissionService {
     }
   }
 
+  async createMany(createPermissionsDto: CreatePermissionDto[]) {
+    for (const { name } of createPermissionsDto) {
+      await this.notExistWithName(name);
+    }
+    try {
+      return await this.permissionModel.insertMany(createPermissionsDto);
+    } catch (exception) {
+      throw new InternalServerErrorException(`Error in create permission: ${exception.message}`);
+    }
+  }
+
   async notExistWithName(name: string) {
     const permission = await this.permissionModel.exists({ name });
     if (permission)

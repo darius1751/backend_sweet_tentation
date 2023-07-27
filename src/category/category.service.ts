@@ -22,6 +22,18 @@ export class CategoryService {
 
   }
 
+  async createMany(createCategoriesDto: CreateCategoryDto[]) {
+    for (const { name } of createCategoriesDto) {
+      await this.notExistWithName(name);
+    }    
+    try {
+        return this.categoryModel.insertMany(createCategoriesDto);
+      } catch (exception) {
+        throw new InternalServerErrorException(`Error in create category: ${exception.message}`);
+      }
+
+  }
+
   private async notExistWithName(name: string) {
     const existCategory = await this.categoryModel.exists({ name });
     if (existCategory)
