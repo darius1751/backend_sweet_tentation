@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UploadedFiles, UseFilters, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UploadedFiles, UseFilters, UseInterceptors, UseGuards } from '@nestjs/common';
 import { OfferService } from './offer.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
@@ -9,7 +9,9 @@ import { CreateWithFileErrorFilter } from 'src/common/filters/create-with-file-e
 import { validateFile } from 'src/common/utils/validateFile';
 import { RequirePermission } from 'src/common/decorators/requirePermission.decorator';
 import { Permission } from 'src/common/permission.enum';
+import { PermissionGuard } from 'src/common/guards/permission/permission.guard';
 
+@UseGuards(PermissionGuard)
 @Controller('offer')
 export class OfferController {
 

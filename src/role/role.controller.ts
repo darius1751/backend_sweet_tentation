@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { RoleService } from './role.service';
 import { MongoIdPipe } from 'src/common/pipes/mongo-id/mongo-id.pipe';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { RequirePermission } from 'src/common/decorators/requirePermission.decorator';
 import { Permission } from 'src/common/permission.enum';
+import { PermissionGuard } from 'src/common/guards/permission/permission.guard';
 
+@UseGuards(PermissionGuard)
 @Controller('role')
 export class RoleController {
 

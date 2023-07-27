@@ -1,11 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { PermissionService } from './permission.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { MongoIdPipe } from 'src/common/pipes/mongo-id/mongo-id.pipe';
 import { RequirePermission } from 'src/common/decorators/requirePermission.decorator';
 import { Permission } from 'src/common/permission.enum';
+import { PermissionGuard } from 'src/common/guards/permission/permission.guard';
 
+@UseGuards(PermissionGuard)
 @Controller('permission')
 export class PermissionController {
 

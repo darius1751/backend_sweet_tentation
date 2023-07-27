@@ -6,6 +6,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { PermissionGuard } from 'src/common/guards/permission/permission.guard';
 import { RequirePermission } from 'src/common/decorators/requirePermission.decorator';
 import { Permission as PermissionEnum } from 'src/common/permission.enum';
+
 @UseGuards(PermissionGuard)
 @Controller('category')
 export class CategoryController {

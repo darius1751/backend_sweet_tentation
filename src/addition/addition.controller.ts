@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, ParseIntPipe, UseFilters, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, ParseIntPipe, UseFilters, Query, UseGuards } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { validateFile } from 'src/common/utils/validateFile';
 import { MongoIdPipe } from 'src/common/pipes/mongo-id/mongo-id.pipe';
@@ -8,7 +8,9 @@ import { AdditionService } from './addition.service';
 import { CreateWithFileErrorFilter } from 'src/common/filters/create-with-file-error/create-with-file-error.filter';
 import { RequirePermission } from 'src/common/decorators/requirePermission.decorator';
 import { Permission } from 'src/common/permission.enum';
+import { PermissionGuard } from 'src/common/guards/permission/permission.guard';
 
+@UseGuards(PermissionGuard)
 @Controller('addition')
 export class AdditionController {
   
