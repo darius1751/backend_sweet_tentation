@@ -10,6 +10,7 @@ import { MongoIdPipe } from 'src/common/pipes/mongo-id/mongo-id.pipe';
 import { RequirePermission } from 'src/common/decorators/requirePermission.decorator';
 import { Permission } from 'src/common/permission.enum';
 import { PermissionGuard } from 'src/common/guards/permission/permission.guard';
+import { ParseIntPaginationPipe } from 'src/common/pipes/parse-int-pagination/parse-int-pagination.pipe';
 
 @UseGuards(PermissionGuard)
 @Controller('sweet')
@@ -42,8 +43,8 @@ export class SweetController {
 
   @Get()
   findAll(
-    @Query('skip', ParseIntPipe) skip: number,
-    @Query('take', ParseIntPipe) take: number
+    @Query('skip', ParseIntPaginationPipe) skip: number,
+    @Query('take', ParseIntPaginationPipe) take: number
   ) {
     return this.sweetService.findAll(skip, take);
   }

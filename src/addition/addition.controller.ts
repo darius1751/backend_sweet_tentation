@@ -9,11 +9,12 @@ import { CreateWithFileErrorFilter } from 'src/common/filters/create-with-file-e
 import { RequirePermission } from 'src/common/decorators/requirePermission.decorator';
 import { Permission } from 'src/common/permission.enum';
 import { PermissionGuard } from 'src/common/guards/permission/permission.guard';
+import { ParseIntPaginationPipe } from 'src/common/pipes/parse-int-pagination/parse-int-pagination.pipe';
 
 @UseGuards(PermissionGuard)
 @Controller('addition')
 export class AdditionController {
-  
+
   constructor(private readonly additionService: AdditionService) { }
 
   @RequirePermission(Permission.CREATE_ADDITION)
@@ -34,13 +35,13 @@ export class AdditionController {
 
   @Get()
   findAll(
-    @Query('skip', ParseIntPipe) skip: number,
-    @Query('take', ParseIntPipe) take: number
+    @Query('skip', ParseIntPaginationPipe) skip: number,
+    @Query('take', ParseIntPaginationPipe) take: number
   ) {
     return this.additionService.findAll(skip, take);
   }
 
-  
+
   @Get(':id')
   findOneById(@Param('id', MongoIdPipe) id: string) {
     return this.additionService.findOneById(id);
