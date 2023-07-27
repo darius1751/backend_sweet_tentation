@@ -47,9 +47,9 @@ export class AdditionService {
   async findAll(skip: number, take: number) {
     const additions = await this.additionModel.find({}, {}, { skip, limit: take });
     const findAdditionsDto: FindAdditionDto[] = [];
-    for (const { id } of additions) {
-      const addition = await this.findOneById(id);
-      findAdditionsDto.push(addition);
+    for (const { id, name, price, image } of additions) {
+      const { id: imageId, secureUrl, createdAt, updatedAt } = image;
+      findAdditionsDto.push({ id, name, price, image: { id: imageId, secureUrl, createdAt, updatedAt}});
     }
     return findAdditionsDto;
   }

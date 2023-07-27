@@ -113,9 +113,15 @@ export class OrderService {
   async findAll(skip: number, take: number) {
     const orders = await this.orderModel.find({}, {}, { skip, limit: take });
     const findOrdersDto: FindOrderDto[] = [];
-    for (const { id } of orders) {
-      const order = await this.findOneById(id);
-      findOrdersDto.push(order);
+    for (const { id, totalToPay, sweets, offers } of orders) {
+      const findSweetsOrderDto = await this.formattedOrderSweets(sweets);
+      const findOffersOrderDto = await this.formattedOrderOffers(offers);
+      return {
+        id,
+        sweets: findSweetsOrderDto,
+        offers: findOffersOrderDto,
+        totalToPay
+      }
     }
     return findOrdersDto;
   }
@@ -124,8 +130,8 @@ export class OrderService {
     const order = await this.orderModel.findById(id);
     if (order) {
       const { totalToPay, sweets, offers } = order;
-      const findSweetsOrderDto = await this.applyFormattedSweets(sweets);
-      const findOffersOrderDto = await this.applyFormattedOffers(offers);
+      const findSweetsOrderDto = await this.formattedOrderSweets(sweets);
+      const findOffersOrderDto = await this.formattedOrderOffers(offers);
       return {
         id,
         sweets: findSweetsOrderDto,
@@ -136,25 +142,25 @@ export class OrderService {
     throw new BadRequestException(`Not exist order with id: ${id}`);
   }
 
-  private async applyFormattedSweets(sweetsOrder: SweetOrder[]) {
+  private async formattedOrderSweets(sweetsOrder: SweetOrder[]) {
     const findSweetsOrderDto: FindSweetOrderDto[] = [];
     for (const { id, title, sweet, price, cant, additions, totalToPay, observations } of sweetsOrder) {
-      const applyFormattedAdditions = await this.applyFormattedAdditions(additions);
-      findSweetsOrderDto.push({ id, sweet, title, price, cant, additions: applyFormattedAdditions, totalToPay, observations })
+      const formattedOrderAdditions = await this.formattedOrderAdditions(additions);
+      findSweetsOrderDto.push({ id, sweet, title, price, cant, additions: formattedOrderAdditions, totalToPay, observations })
     }
     return findSweetsOrderDto;
   }
 
-  private async applyFormattedOffers(offers: OfferOrder[]) {
+  private async formattedOrderOffers(offers: OfferOrder[]) {
     const findOffersOrderDto: FindOfferOrderDto[] = [];
     for (const { id, offer, title, price, cant, additions, observations, totalToPay } of offers) {
-      const applyFormattedAdditions = await this.applyFormattedAdditions(additions);
-      findOffersOrderDto.push({ id, offer, title, price, cant, additions: applyFormattedAdditions, totalToPay, observations })
+      const formattedOrderAdditions = await this.formattedOrderAdditions(additions);
+      findOffersOrderDto.push({ id, offer, title, price, cant, additions: formattedOrderAdditions, totalToPay, observations })
     }
     return findOffersOrderDto;
   }
 
-  private async applyFormattedAdditions(additions: AdditionOrder[]) {
+  private async formattedOrderAdditions(additions: AdditionOrder[]) {
     const findAdditionsOrderDto: FindAdditionOrderDto[] = [];
     for (const additionOrder of additions) {
       const { id, addition, name, price, cant, totalToPay } = additionOrder;

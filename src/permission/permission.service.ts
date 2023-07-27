@@ -41,11 +41,19 @@ export class PermissionService {
     }
   }
 
+  async formatted(permissionsIds: string[]) {
+    const permissions: FindPermissionDto[] = [];
+    for (const permissionId of permissionsIds) {
+      const permission = await this.findOneById(permissionId);
+      permissions.push(permission);
+    }
+    return permissions;
+  }
   async findAll() {
     const permissions = await this.permissionModel.find();
     const findPermissionsDto: FindPermissionDto[] = [];
-    for (const { id } of permissions) {
-      findPermissionsDto.push(await this.findOneById(id));
+    for (const { id, name, description } of permissions) {
+      findPermissionsDto.push({ id, name, description });
     }
     return findPermissionsDto;
   }

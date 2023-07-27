@@ -1,7 +1,7 @@
 import { BadRequestException } from "@nestjs/common";
 import { Transform } from "class-transformer";
 import { IsDateString, IsNumberString, IsOptional, IsString, isMongoId } from "class-validator";
-import { transformMongoIdArray } from "src/common/utils/transformMongoIdArray";
+import { transformMongoIdArray } from "src/common/pipes/transformMongoIdArray";
 
 
 // import { ParseMongoIdArray } from "src/parseMongoIdArray";

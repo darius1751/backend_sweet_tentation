@@ -36,24 +36,19 @@ export class RoleService {
 
   async findAll() {
     const roles = await this.roleModel.find();
-    const formattedRoles = [];
-    for (const { id } of roles) {
-      const role = await this.findOneById(id);
-      formattedRoles.push(role);
+    const findRolesDto:FindRoleDto[] = [];
+    for (const { id, name, permissions: permissionsIds } of roles) {
+      const permissions: FindPermissionDto[] = await this.permissionService.formatted(permissionsIds);
+      findRolesDto.push({ id, name, permissions });
     }
-    return formattedRoles;
+    return findRolesDto;
   }
 
   async findOneById(id: string): Promise<FindRoleDto> {
     const role = await this.roleModel.findById(id);
     if (role) {
       const { name, permissions: permissionsIds } = role;
-      const permissions: FindPermissionDto[] = [];
-      for (const permissionId of permissionsIds) {
-        const permission = await this.permissionService.findOneById(permissionId);
-        permissions.push(permission);
-      }
-
+      const permissions: FindPermissionDto[] = await this.permissionService.formatted(permissionsIds);
       return {
         id,
         name,
