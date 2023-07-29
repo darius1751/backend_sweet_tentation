@@ -17,7 +17,7 @@ export class AdditionController {
 
   constructor(private readonly additionService: AdditionService) { }
 
-  @RequirePermission(Permission.CREATE_ADDITION)
+  // @RequirePermission(Permission.CREATE_ADDITION)
   @Post()
   @UseInterceptors(FileInterceptor('image', {
     dest: './temp',

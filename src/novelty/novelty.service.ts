@@ -6,6 +6,7 @@ import { UpdateNoveltyDto } from './dto/update-novelty.dto';
 import { SweetService } from 'src/sweet/sweet.service';
 import { Novelty } from './entities/novelty.entity';
 import { FindNoveltyDto } from './dto/find-novelty.dto';
+import { getPagination } from 'src/common/utils/getPagination';
 
 @Injectable()
 export class NoveltyService {
@@ -38,7 +39,9 @@ export class NoveltyService {
       const sweet = await this.sweetService.findOneById(sweetId);
       findNoveltiesDto.push({ id, sweet, active, limitTime, createdAt, updatedAt });
     }
-    return findNoveltiesDto;
+    const totalRegisters = await this.noveltyModel.count();
+    const pagination = getPagination({ skip, take, totalResults: findNoveltiesDto.length, totalRegisters })
+    return { novelties: findNoveltiesDto, pagination };
   }
 
   async findOneById(id: string): Promise<FindNoveltyDto> {

@@ -13,6 +13,7 @@ import { saveImages } from 'src/common/utils/saveImages';
 import { FindCategoryDto } from 'src/category/dto/find-category-dto';
 import { FindSweetDto } from './dto/find-sweet-dto';
 import { Image } from './entities/image.entity';
+import { getPagination } from 'src/common/utils/getPagination';
 
 @Injectable()
 export class SweetService {
@@ -81,7 +82,9 @@ export class SweetService {
         description
       });
     }
-    return findSweetsDto;
+    const totalRegisters = await this.sweetModel.count();
+    const pagination = getPagination({ skip, take, totalResults: findSweetsDto.length, totalRegisters });
+    return {sweets: findSweetsDto, pagination};
   }
   public async formattedImages(images: Image[]) {
     return images.map(({ id, createdAt, updatedAt, secureUrl }) => ({ id, createdAt, updatedAt, secureUrl }));

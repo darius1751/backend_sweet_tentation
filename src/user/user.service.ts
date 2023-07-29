@@ -8,6 +8,8 @@ import { LoginCredentialDto } from 'src/credential/dto/login-credential.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { CredentialService } from 'src/credential/credential.service';
 import { RoleService } from 'src/role/role.service';
+import { FindUserDto } from './dto/find-user.dto';
+import { getPagination } from 'src/common/utils/getPagination';
 
 @Injectable()
 export class UserService {
@@ -46,7 +48,7 @@ export class UserService {
     }
     throw new ForbiddenException(`User ${loginCredentialDto.user} not active or not exist`);
   }
-  
+
   private async notExistEmail(email: string) {
     const existEmail = await this.userModel.exists({ email });
     if (existEmail)
@@ -61,13 +63,21 @@ export class UserService {
 
   async findAll(skip: number, take: number) {
     try {
-      return this.userModel.find({}, { credential: false }, { limit: take, skip });
+      const users = await this.userModel.find({}, { credential: false }, { limit: take, skip });
+      const findUsersDto: FindUserDto[] = [];
+      for (const { id, name, phone, email, address, active, roleId } of users) {
+        const role = await this.roleService.findOneById(roleId);
+        findUsersDto.push({ id, name, phone, email, address, active, role });
+      }
+      const totalRegisters = await this.userModel.count();
+      const totalResults = findUsersDto.length;
+      return { users: findUsersDto, pagination: getPagination({ skip, take, totalResults, totalRegisters }) }
     } catch (exception) {
       throw new BadRequestException(`skip and take is a positive int`);
     }
   }
 
-  async findOneById(id: string) {
+  async findOneById(id: string): Promise<FindUserDto> {
     const user = await this.userModel.findById(id);
     if (user) {
       const { roleId } = user;
