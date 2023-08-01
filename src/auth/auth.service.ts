@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { isMongoId } from 'class-validator';
-import { RoleService } from 'src/role/role.service';
+import { RoleService } from '../role/role.service';
 
 export type SignInJwt = {
     user: string,
