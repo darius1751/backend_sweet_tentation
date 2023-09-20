@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { SchemaTypes } from "mongoose";
-import { Permission } from "src/permission/entities/permission.entity";
+import { Permission } from "../../permission/entities/permission.entity";
 
 @Schema({ versionKey: false })
 export class Role {

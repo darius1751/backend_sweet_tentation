@@ -23,12 +23,13 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     const { email, credential, phone, roleId } = createUserDto;
+    console.log({ email, phone });
     await this.notExistEmail(email);
     await this.notExistPhone(phone);
     await this.roleService.findOneById(roleId);
     const { id } = await this.credentialService.create(credential);
     try {
-      return await this.userModel.create({ ...createUserDto, credentialId: id }, { credentialId: false });
+      return await this.userModel.create({ ...createUserDto, credentialId: id });
     } catch (exception) {
       await this.credentialService.remove(id);
       throw new BadRequestException(`${exception.message}`);

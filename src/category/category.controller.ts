@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { MongoIdPipe } from 'src/common/pipes/mongo-id/mongo-id.pipe';
+import { MongoIdPipe } from '../common/pipes/mongo-id/mongo-id.pipe';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { PermissionGuard } from 'src/common/guards/permission/permission.guard';
-import { RequirePermission } from 'src/common/decorators/requirePermission.decorator';
-import { Permission as PermissionEnum } from 'src/common/permission.enum';
+import { PermissionGuard } from '../common/guards/permission/permission.guard';
+import { RequirePermission } from '../common/decorators/requirePermission.decorator';
+import { Permission as PermissionEnum } from '../common/permission.enum';
 
 @UseGuards(PermissionGuard)
 @Controller('category')
@@ -27,6 +27,7 @@ export class CategoryController {
   ) {
     return this.categoryService.createMany(CreateCategoriesDto);
   }
+
   @Get()
   findAll() {
     return this.categoryService.findAll();

@@ -3,9 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Role } from './entities/role.entity';
 import { CreateRoleDto } from './dto/create-role.dto';
-import { PermissionService } from 'src/permission/permission.service';
+import { PermissionService } from '../permission/permission.service';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { FindPermissionDto } from 'src/permission/dto/find-permission.dto';
+import { FindPermissionDto } from '../permission/dto/find-permission.dto';
 import { FindRoleDto } from './dto/find-role.dto';
 
 @Injectable()
