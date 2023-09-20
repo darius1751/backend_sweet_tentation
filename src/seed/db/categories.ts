@@ -65,9 +65,6 @@ export const categories: CreateCategoryDto[] = [
         name: "Mora"
     },
     {
-        name: "Granizado"
-    },
-    {
         name: "Manzana"
     },
     {
